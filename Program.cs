@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
 
 public class User
 {
@@ -10,7 +11,6 @@ public class User
         get;
         set;
     }
-
     public string PasswordHash
     {
         get;
@@ -24,29 +24,28 @@ public class User
     }
 }
 
+//-------------------BASIC USER MANAGER---------------------//
 public class UserManager
 {
-    // Text file to store user data
     private const string UserFilePath = @"C:\Users\HP\Desktop\users.txt";
 
-
-
-    //--------------------USER REGISTRATION------------------------//
     public void RegisterUser(string username, string password)
     {
+        //------------------CHECKING FOR EMAIL FORMAT-------------------//
         if (!IsEmailValid(username))
         {
-            Console.WriteLine("Invalid email format.");
+            MessageBox.Show("Invalid email format.");
             return;
         }
 
+        //------------------CHECKING FOR PASSWORD COMPLEXITY-------------------//
         if (!IsPasswordComplex(password))
         {
-            Console.WriteLine("Password should contain at least one uppercase letter, one lowercase letter, one digit, and be at least 8 characters long.");
+            MessageBox.Show("Password should contain at least one uppercase letter, one lowercase letter, one digit, and be at least 8 characters long.");
             return;
         }
 
-        // Generate a secure password hash using PBKDF2
+        //------------------PASSWORD HASH GENERATION-------------------//
         string passwordHash = GeneratePasswordHash(password);
 
         var user = new User(username, passwordHash);
@@ -54,11 +53,11 @@ public class UserManager
 
         File.AppendAllLines(UserFilePath, new[] { userData });
 
-        Console.WriteLine("Registration complete.\n");
+        MessageBox.Show("Registration complete.");
     }
 
 
-    //--------------------LOGIN FUNCTION-----------------------//
+    //-------------------ALL THE LOGIN PROCEDURE FILE CHECKING---------------------//
     public bool Login(string username, string password)
     {
         if (File.Exists(UserFilePath))
@@ -74,35 +73,30 @@ public class UserManager
 
                     if (storedUsername == username && VerifyPasswordHash(password, storedPasswordHash))
                     {
-                        return true; // User found and password matches
+                        return true;
                     }
                 }
             }
         }
 
-        return false; // User not found or password doesn't match
+        return false;
     }
 
 
-
-    //---------------------------EMAIL FORMAT-------------------//
+    //-------------------VALID CHARACTER IN THE EMAIL---------------------//
     private bool IsEmailValid(string email)
     {
-        // Use a simple regular expression to validate email format
         return Regex.IsMatch(email, @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
     }
 
 
-    //-----------------------PASSWORD COMPLEXITY------------------//
+    //-------------------PASSWORD COMPLEXITY---------------------//
     private bool IsPasswordComplex(string password)
     {
-        // Check if the password meets complexity requirements
         return Regex.IsMatch(password, @"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$");
     }
 
-
-
-    //-------------------GENERATING THE HASH-----------------------//
+    //----------------PASSWORD HASH---------------------//
     private string GeneratePasswordHash(string password)
     {
         byte[] salt;
@@ -118,14 +112,9 @@ public class UserManager
     }
 
 
-    //--------------------------------------------------------------//
-
-
-
-    //-------------------PASSWORD HASH VERIFICATION--------------------//
+    //-------------------VERIFY PASSWORD HASH---------------------//
     private bool VerifyPasswordHash(string password, string storedHash)
     {
-        // Verify a password against a stored password hash
         byte[] hashBytes = Convert.FromBase64String(storedHash);
         byte[] salt = new byte[16];
         Array.Copy(hashBytes, 0, salt, 0, 16);
@@ -144,82 +133,140 @@ public class UserManager
         return true;
     }
 }
-//---------------------------------------------------------//
 
+//-------------------LOGIN FORM---------------------//
 public class Program
 {
     public static void Main()
     {
-        var userManager = new UserManager();
+        Application.EnableVisualStyles();
+        Application.SetCompatibleTextRenderingDefault(false);
+        Application.Run(new LoginForm());
+    }
+}
 
-        while (true)
+//-------------------LOGIN FORM---------------------//
+public class LoginForm : Form
+{
+    private UserManager userManager = new UserManager();
+
+    private TextBox emailTextBox;
+    private TextBox passwordTextBox;
+    private Button registerButton;
+    private Button loginButton;
+
+    public LoginForm()
+    {
+        InitializeComponents();
+        this.BackColor = System.Drawing.Color.Black;
+
+
+        PictureBox pictureBox = new PictureBox
         {
-            //--------------------REGISTRATION MENU------------------//
-            Console.WriteLine("-----Welcome to User Registration-------");
-            Console.Write("Please enter email: ");
-            string regEmail = Console.ReadLine();
+            Image = Image.FromFile(@"C:\Users\HP\Desktop\LOGO.png"),
+            SizeMode = PictureBoxSizeMode.AutoSize,
+            Location = new System.Drawing.Point(10, 10),
+        };
+        this.Controls.Add(pictureBox);
 
-            Console.Write("Please enter password: ");
-            string regPassword = Console.ReadLine(); //Reading password normally at the time of registration
 
-            userManager.RegisterUser(regEmail, regPassword);
+        emailTextBox.Location = new System.Drawing.Point(10, pictureBox.Bottom + 20);
+        passwordTextBox.Location = new System.Drawing.Point(10, emailTextBox.Bottom + 30);
+        registerButton.Location = new System.Drawing.Point(50, passwordTextBox.Bottom + 30);
+        loginButton.Location = new System.Drawing.Point(200, passwordTextBox.Bottom + 30);
 
-            //------------------------LOGIN MENU---------------//
-            Console.WriteLine("---------Welcome to User Login----------");
-            Console.Write("Please enter email: ");
-            string loginEmail = Console.ReadLine();
 
-           
-            Console.Write("Please enter password: ");
-            string loginPassword = MaskPasswordInput();//Login password masking
+        Label emailLabel = new Label
+        {
+            Text = "Email:",
+            Location = new System.Drawing.Point(10, emailTextBox.Top - 20),
+            ForeColor = System.Drawing.Color.White,
+        };
 
-            //------------CHECKING FOR THE LOGIN EMAIL AND PASSWORD----------------//
-            if (userManager.Login(loginEmail, loginPassword))
-            {
-                Console.WriteLine("Login successful!");
-            }
-            else
-            {
-                Console.WriteLine("Login failed. Invalid email or password.");
-            }
+        Label passwordLabel = new Label
+        {
+            Text = "Password:",
+            Location = new System.Drawing.Point(10, passwordTextBox.Top - 20),
+            ForeColor = System.Drawing.Color.White,
+        };
 
-            //----------------ASKING IF USER WISHES TO LOGIN/REGISTER AGAIN-------------//
-            Console.WriteLine("Do you want to register/login again? (y/n): ");
-            string choice = Console.ReadLine().ToLower();
+        this.Controls.Add(emailLabel);
+        this.Controls.Add(passwordLabel);
 
-            if (choice != "y")
-            {
-                break;
-            }
+
+        registerButton.BackColor = System.Drawing.Color.Gray;
+        registerButton.ForeColor = System.Drawing.Color.Black;
+
+        loginButton.BackColor = System.Drawing.Color.Gray;
+        loginButton.ForeColor = System.Drawing.Color.Black;
+
+
+        this.Size = new System.Drawing.Size(400, loginButton.Bottom + 100);
+
+
+        this.StartPosition = FormStartPosition.CenterScreen;
+    }
+
+    private void InitializeComponents()
+    {
+        this.Text = "User Registration and Login";
+        this.Size = new System.Drawing.Size(400, 200);
+        this.FormBorderStyle = FormBorderStyle.FixedDialog;
+        this.MaximizeBox = false;
+        this.StartPosition = FormStartPosition.CenterScreen;
+
+        emailTextBox = new TextBox
+        {
+            Location = new System.Drawing.Point(120, 20),
+            Size = new System.Drawing.Size(200, 20),
+        };
+
+        passwordTextBox = new TextBox
+        {
+            Location = new System.Drawing.Point(120, emailTextBox.Bottom + 20),
+            Size = new System.Drawing.Size(200, 20),
+            PasswordChar = '*',
+        };
+
+        registerButton = new Button
+        {
+            Text = "Register",
+            Location = new System.Drawing.Point(50, passwordTextBox.Bottom + 20),
+        };
+        registerButton.Click += new EventHandler(RegisterButtonClick);
+
+        loginButton = new Button
+        {
+            Text = "Login",
+            Location = new System.Drawing.Point(200, passwordTextBox.Bottom + 20),
+        };
+        loginButton.Click += new EventHandler(LoginButtonClick);
+
+        this.Controls.Add(emailTextBox);
+        this.Controls.Add(passwordTextBox);
+        this.Controls.Add(registerButton);
+        this.Controls.Add(loginButton);
+    }
+
+    private void RegisterButtonClick(object sender, EventArgs e)
+    {
+        string email = emailTextBox.Text;
+        string password = passwordTextBox.Text;
+        userManager.RegisterUser(email, password);
+    }
+
+    private void LoginButtonClick(object sender, EventArgs e)
+    {
+        string email = emailTextBox.Text;
+        string password = passwordTextBox.Text;
+
+        if (userManager.Login(email, password))
+        {
+            MessageBox.Show("Login successful!");
+        }
+        else
+        {
+            MessageBox.Show("Login failed. Invalid email or password.");
         }
     }
-
-    //---------------FOR MASKING THE PASSWORD----------------//
-    private static string MaskPasswordInput()
-    {
-        string password = "";
-        ConsoleKeyInfo keyInfo;
-
-        do
-        {
-            keyInfo = Console.ReadKey(intercept: true);
-
-            if (keyInfo.Key == ConsoleKey.Backspace && password.Length > 0)
-            {
-                // Backspace removing character but not being added to password
-                Console.Write("\b \b");
-                password = password.Substring(0, password.Length - 1);
-            }
-            else if (keyInfo.Key != ConsoleKey.Enter)
-            {
-                // Mask the password with an asterisk and add the character to the password
-                Console.Write("*");
-                password += keyInfo.KeyChar;
-            }
-        } while (keyInfo.Key != ConsoleKey.Enter);
-
-        Console.WriteLine(); // Newline after password entry
-        return password;
-    }
-
 }
