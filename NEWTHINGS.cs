@@ -40,9 +40,10 @@ public class UserManager
         }
 
         //------------------CHECKING FOR PASSWORD COMPLEXITY-------------------//
-        bool IsPasswordComplex(string password)
+        if (!IsPasswordComplex(password))
         {
-            return Regex.IsMatch(password, @"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$");
+            MessageBox.Show("Password must have at least 8 characters, including one uppercase letter and one digit.");
+            return;
         }
 
         //------------------PASSWORD HASH GENERATION-------------------//
@@ -91,10 +92,39 @@ public class UserManager
 
 
     //-------------------PASSWORD COMPLEXITY---------------------//
+
     private bool IsPasswordComplex(string password)
     {
-        return Regex.IsMatch(password, @"^(?=.\d)(?=.[a-z])(?=.*[A-Z]).{8,}$");
+        if (password.Length < 8)
+        {
+            return false; // Password is too short
+        }
+
+        bool hasDigit = false;
+        bool hasLower = false;
+        bool hasUpper = false;
+
+        foreach (char c in password)
+        {
+            if (char.IsDigit(c))
+            {
+                hasDigit = true;
+            }
+            else if (char.IsLower(c))
+            {
+                hasLower = true;
+            }
+            else if (char.IsUpper(c))
+            {
+                hasUpper = true;
+            }
+        }
+
+        return hasDigit && hasLower && hasUpper;
     }
+
+
+
 
     //----------------PASSWORD HASH---------------------//
     private string GeneratePasswordHash(string password)
