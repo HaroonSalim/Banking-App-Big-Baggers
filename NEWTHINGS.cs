@@ -40,10 +40,9 @@ public class UserManager
         }
 
         //------------------CHECKING FOR PASSWORD COMPLEXITY-------------------//
-        if (!IsPasswordComplex(password))
+        bool IsPasswordComplex(string password)
         {
-            MessageBox.Show("Password should contain at least one uppercase letter, one lowercase letter, one digit, and be at least 8 characters long.");
-            return;
+            return Regex.IsMatch(password, @"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$");
         }
 
         //------------------PASSWORD HASH GENERATION-------------------//
@@ -193,7 +192,7 @@ public class LoginForm : Form
         Label emailLabel = new Label
         {
             Text = "Email:",
-            TextAlign = ContentAlignment.TopCenter, 
+            TextAlign = ContentAlignment.TopCenter,
             Location = new System.Drawing.Point(120, emailTextBox.Top - 20),
             ForeColor = System.Drawing.Color.White,
         };
@@ -201,18 +200,18 @@ public class LoginForm : Form
         Label passwordLabel = new Label
         {
             Text = "Password:",
-            TextAlign = ContentAlignment.TopCenter, 
-            Location = new System.Drawing.Point(120, emailLabel.Bottom + 25), 
+            TextAlign = ContentAlignment.TopCenter,
+            Location = new System.Drawing.Point(120, emailLabel.Bottom + 25),
             ForeColor = System.Drawing.Color.White,
         };
 
 
-        emailTextBox.Location = new System.Drawing.Point(80, pictureBox.Bottom + 20); 
+        emailTextBox.Location = new System.Drawing.Point(80, pictureBox.Bottom + 20);
         passwordTextBox.Location = new System.Drawing.Point(80, emailTextBox.Bottom + 30);
 
 
-        registerButton.Location = new System.Drawing.Point(100, passwordTextBox.Bottom + 30); 
-        loginButton.Location = new System.Drawing.Point(200, passwordTextBox.Bottom + 30); 
+        registerButton.Location = new System.Drawing.Point(100, passwordTextBox.Bottom + 30);
+        loginButton.Location = new System.Drawing.Point(200, passwordTextBox.Bottom + 30);
 
 
         this.Controls.Add(emailLabel);
