@@ -4,6 +4,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using static LoginForm;
 
 public class User
 {
@@ -28,7 +29,7 @@ public class User
 //-------------------BASIC USER MANAGER---------------------//
 public class UserManager
 {
-    private const string UserFilePath = @"C:\Users\HP\Desktop\users.txt";
+    private const string UserFilePath = @"C:\Users\HP\Desktop\DATA.txt";
 
     public void RegisterUser(string username, string password)
     {
@@ -42,7 +43,7 @@ public class UserManager
         //------------------CHECKING FOR PASSWORD COMPLEXITY-------------------//
         if (!IsPasswordComplex(password))
         {
-            MessageBox.Show("Password should contain at least one uppercase letter, one lowercase letter, one digit, and be at least 8 characters long.");
+            MessageBox.Show("Password must have at least 8 characters, including one uppercase letter and one digit.");
             return;
         }
 
@@ -92,10 +93,39 @@ public class UserManager
 
 
     //-------------------PASSWORD COMPLEXITY---------------------//
+
     private bool IsPasswordComplex(string password)
     {
-        return Regex.IsMatch(password, @"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$");
+        if (password.Length < 8)
+        {
+            return false; // Password is too short
+        }
+
+        bool hasDigit = false;
+        bool hasLower = false;
+        bool hasUpper = false;
+
+        foreach (char c in password)
+        {
+            if (char.IsDigit(c))
+            {
+                hasDigit = true;
+            }
+            else if (char.IsLower(c))
+            {
+                hasLower = true;
+            }
+            else if (char.IsUpper(c))
+            {
+                hasUpper = true;
+            }
+        }
+
+        return hasDigit && hasLower && hasUpper;
     }
+
+
+
 
     //----------------PASSWORD HASH---------------------//
     private string GeneratePasswordHash(string password)
@@ -164,9 +194,9 @@ public class LoginForm : Form
 
         PictureBox pictureBox = new PictureBox
         {
-            Image = Image.FromFile(@"C:\Users\HP\Desktop\LOGO.png"),
+            Image = Image.FromFile(@"C:\Users\HP\Desktop\LOGO.png"),//change the pc name from "HP" to whatever the name of your pc is 
             SizeMode = PictureBoxSizeMode.AutoSize,
-            Location = new System.Drawing.Point(-40, 10), 
+            Location = new System.Drawing.Point(-40, 10),
         };
         this.Controls.Add(pictureBox);
 
@@ -185,22 +215,34 @@ public class LoginForm : Form
         passwordTextBox.Leave += TextBox_Leave;
         //-----------------------------------------------------//
 
+
+
+        emailTextBox.Location = new System.Drawing.Point(-1000, pictureBox.Bottom + 20);
+        passwordTextBox.Location = new System.Drawing.Point(-1000, emailTextBox.Bottom + 30);
+
         Label emailLabel = new Label
         {
             Text = "Email:",
-            Location = new System.Drawing.Point(10, emailTextBox.Top - 20),
+            TextAlign = ContentAlignment.TopCenter,
+            Location = new System.Drawing.Point(120, emailTextBox.Top - 20),
             ForeColor = System.Drawing.Color.White,
         };
 
         Label passwordLabel = new Label
         {
             Text = "Password:",
-            Location = new System.Drawing.Point(10, passwordTextBox.Top - 20),
+            TextAlign = ContentAlignment.TopCenter,
+            Location = new System.Drawing.Point(120, emailLabel.Bottom + 25),
             ForeColor = System.Drawing.Color.White,
         };
 
-        registerButton.Location = new System.Drawing.Point(70, passwordTextBox.Bottom + 20);
-        loginButton.Location = new System.Drawing.Point(220, passwordTextBox.Bottom + 20);
+
+        emailTextBox.Location = new System.Drawing.Point(80, pictureBox.Bottom + 20);
+        passwordTextBox.Location = new System.Drawing.Point(80, emailTextBox.Bottom + 30);
+
+
+        registerButton.Location = new System.Drawing.Point(100, passwordTextBox.Bottom + 30);
+        loginButton.Location = new System.Drawing.Point(200, passwordTextBox.Bottom + 30);
 
 
         this.Controls.Add(emailLabel);
@@ -212,6 +254,7 @@ public class LoginForm : Form
 
         loginButton.BackColor = System.Drawing.Color.LightGreen;
         loginButton.ForeColor = System.Drawing.Color.Black;
+
 
 
         this.Size = new System.Drawing.Size(400, loginButton.Bottom + 100);
@@ -244,22 +287,24 @@ public class LoginForm : Form
         }
     }
     //-----------------------------------------------------------------------//
-    
-    
+
+
     private void InitializeComponents()
     {
-        this.Text = "User Registration and Login";
+        this.Text = "Welcome to Big Bag";
         this.Size = new System.Drawing.Size(400, 200);
         this.FormBorderStyle = FormBorderStyle.FixedDialog;
         this.MaximizeBox = false;
         this.StartPosition = FormStartPosition.CenterScreen;
 
+        //------------------EMAIL TEXTBOX-----------------//
         emailTextBox = new TextBox
         {
             Location = new System.Drawing.Point(120, 20),
             Size = new System.Drawing.Size(200, 20),
         };
 
+        //-------------------PASSWORD TEXTBOX------------------//
         passwordTextBox = new TextBox
         {
             Location = new System.Drawing.Point(120, emailTextBox.Bottom + 20),
@@ -267,6 +312,7 @@ public class LoginForm : Form
             PasswordChar = '*',
         };
 
+        //----------------REGISTER BUTTON-------------------//
         registerButton = new Button
         {
             Text = "Register",
@@ -274,6 +320,7 @@ public class LoginForm : Form
         };
         registerButton.Click += new EventHandler(RegisterButtonClick);
 
+        //-------------------LOGIN BUTTON----------------//
         loginButton = new Button
         {
             Text = "Login",
@@ -304,10 +351,225 @@ public class LoginForm : Form
         if (userManager.Login(email, password))
         {
             MessageBox.Show("Login successful!");
+            this.Hide();
+            DashboardForm dashboard = new DashboardForm();
+            dashboard.Show();
         }
         else
         {
             MessageBox.Show("Login failed. Invalid email or password.");
         }
     }
+
+    //-------------------DASHBOARD CLASS---------------------//
+    public class DashboardForm : Form
+    {
+        public DashboardForm()
+        {
+            InitializeComponents();
+        }
+
+        private string userEmail;
+        private string userPassword;
+
+        public DashboardForm(string userEmail, string userPassword)
+        {
+            this.userEmail = userEmail;
+            this.userPassword = userPassword;
+            InitializeComponents();
+        }
+
+        private void InitializeComponents()
+        {
+            this.Text = "Dashboard";
+            this.Size = new System.Drawing.Size(500, 300);
+            this.StartPosition = FormStartPosition.CenterScreen;
+            this.BackColor = Color.FromArgb(44, 62, 80);  // Dark blue background
+            this.Font = new Font("Arial", 12);
+
+            Label welcomeLabel = new Label
+            {
+                Text = "Welcome to Big Bag!",
+                Location = new System.Drawing.Point(100, 20),
+                Font = new System.Drawing.Font("Arial", 18, FontStyle.Bold),
+                AutoSize = true,
+            };
+                //---------------TRANSACTIONS----------------------------------//
+            Button displayTransactionsButton = CreateButton("Display Transactions", 60, 100);
+            displayTransactionsButton.BackColor = Color.FromArgb(46, 139, 87);  
+            displayTransactionsButton.ForeColor = Color.White;               
+            displayTransactionsButton.FlatStyle = FlatStyle.Flat;             
+            displayTransactionsButton.Font = new Font("Arial", 12, FontStyle.Bold);
+
+
+            displayTransactionsButton.Click += (sender, e) =>
+            {
+                TransactionsForm transactionsForm = new TransactionsForm();
+                transactionsForm.Show();
+            };
+            //-----------------------------------------------------------//
+            //-----------------LOG OUT-------------------------------//
+            Button logoutButton = CreateButton("Log Out", 280, 100);
+            logoutButton.BackColor = Color.FromArgb(192, 57, 43);  
+            logoutButton.ForeColor = Color.White;               
+            logoutButton.FlatStyle = FlatStyle.Flat;  
+            logoutButton.Font = new Font("Arial", 12, FontStyle.Bold);
+
+            logoutButton.Click += (sender, e) =>
+            {
+                this.Close(); // Close the dashboard form
+                LoginForm loginForm = new LoginForm();
+                loginForm.Show(); // Show the login form
+            };
+            //----------------------------------------------//
+
+            //--------------------PROFILE BUTTON CUSTOMIZATIONS-----------------//
+            Button profileButton = CreateButton("Profile Management", 280, 150);
+            profileButton.BackColor = Color.FromArgb(52, 73, 94);   
+            profileButton.ForeColor = Color.White;              
+            profileButton.FlatStyle = FlatStyle.Flat;            
+            profileButton.Font = new Font("Arial", 12, FontStyle.Bold);
+            profileButton.Click += (sender, e) =>
+            {
+                ProfileManagementForm profileForm = new ProfileManagementForm(userEmail, userPassword);
+                profileForm.Show();
+            };
+            //-------------------------------------------------------------------------//
+
+            this.Controls.Add(welcomeLabel);
+            this.Controls.Add(displayTransactionsButton);
+            this.Controls.Add(logoutButton);
+            this.Controls.Add(profileButton);
+        }
+
+        private Button CreateButton(string text, int x, int y)
+        {
+            return new Button
+            {
+                Text = text,
+                Location = new System.Drawing.Point(x, y),
+                Size = new System.Drawing.Size(150, 30),
+                Font = new System.Drawing.Font("Arial", 12),
+            };
+        }
+
+        private void DisplayTransactionsButton_Click(object sender, EventArgs e)
+        {
+            TransactionsForm transactionsForm = new TransactionsForm();
+            transactionsForm.Show();
+        }
+
+        private void LogoutButton_Click(object sender, EventArgs e)
+        {
+            this.Close(); // Close the dashboard form
+            LoginForm loginForm = new LoginForm();
+            loginForm.Show(); // Show the login form
+        }
+
+        private void ProfileButton_Click(object sender, EventArgs e)
+        {
+            ProfileManagementForm profileForm = new ProfileManagementForm(userEmail, userPassword);
+            profileForm.Show();
+        }
+
+    }
+
+    //-----------------------------------------------------//
+
+    //---------------TRANSACTION FORM----------------------//
+    public class TransactionsForm : Form
+    {
+        public TransactionsForm()
+        {
+            InitializeComponents();
+        }
+
+        private void InitializeComponents()
+        {
+            this.Text = "Transactions";
+            this.Size = new System.Drawing.Size(400, 300);
+            this.StartPosition = FormStartPosition.CenterScreen;
+
+
+            ListBox transactionsListBox = new ListBox
+            {
+                Location = new System.Drawing.Point(20, 20),
+                Size = new System.Drawing.Size(360, 200)
+            };
+
+
+            var random = new Random();
+            string[] transactions = new string[10];
+
+            for (int i = 1; i <= 10; i++)
+            {
+                decimal amountInForeignCurrency = random.Next(1, 1000);
+                decimal amountInPKR = ConvertToPKR(amountInForeignCurrency);
+                transactions[i - 1] = $"Transaction {i}: PKR {amountInPKR:N2}";
+            }
+
+            transactionsListBox.Items.AddRange(transactions);
+
+            this.Controls.Add(transactionsListBox);
+        }
+
+        private decimal ConvertToPKR(decimal amountInForeignCurrency)
+        {
+            decimal conversionRate = 280.50M;
+            return amountInForeignCurrency * conversionRate;
+        }
+    }
+
+    //-------------------------------------------------------------------//
+
+    //---------------------PROFILE MANAGMENT----------------------//
+    public class ProfileManagementForm : Form
+{
+    public ProfileManagementForm(string userEmail, string userPassword)
+    {
+        InitializeComponents(userEmail, userPassword);
+    }
+
+    private void InitializeComponents(string userEmail, string userPassword)
+    {
+        this.Text = "Profile Management";
+        this.Size = new System.Drawing.Size(300, 200);
+        this.StartPosition = FormStartPosition.CenterScreen;
+
+        TextBox emailTextBox = new TextBox
+        {
+            Text = userEmail,
+            Location = new System.Drawing.Point(120, 20),
+            Size = new System.Drawing.Size(200, 20),
+        };
+
+        TextBox passwordTextBox = new TextBox
+        {
+            Text = userPassword,
+            Location = new System.Drawing.Point(120, emailTextBox.Bottom + 20),
+            Size = new System.Drawing.Size(200, 20),
+            PasswordChar = '*',
+        };
+
+        Label emailLabel = new Label
+        {
+            Text = "Email:",
+            Location = new System.Drawing.Point(20, 20),
+            Font = new System.Drawing.Font("Arial", 12),
+        };
+
+        Label passwordLabel = new Label
+        {
+            Text = "Password:",
+            Location = new System.Drawing.Point(20, emailLabel.Bottom + 25),
+            Font = new System.Drawing.Font("Arial", 12),
+        };
+
+        this.Controls.Add(emailLabel);
+        this.Controls.Add(emailTextBox); 
+        this.Controls.Add(passwordLabel);
+        this.Controls.Add(passwordTextBox); 
+    }
+}
+    //--------------------------------------------------------------//
 }
