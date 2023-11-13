@@ -189,7 +189,9 @@ public class LoginForm : Form
     public LoginForm()
     {
         InitializeComponents();
-        this.BackColor = System.Drawing.Color.Black;
+        this.FormBorderStyle = FormBorderStyle.Sizable;
+        this.Size = new System.Drawing.Size(400, 200);
+        this.BackColor = Color.FromArgb(31, 31, 31);
 
 
         PictureBox pictureBox = new PictureBox
@@ -199,7 +201,6 @@ public class LoginForm : Form
             Location = new System.Drawing.Point(-40, 10),
         };
         this.Controls.Add(pictureBox);
-
 
         emailTextBox.Location = new System.Drawing.Point(10, pictureBox.Bottom + 20);
         passwordTextBox.Location = new System.Drawing.Point(10, emailTextBox.Bottom + 30);
@@ -215,34 +216,34 @@ public class LoginForm : Form
         passwordTextBox.Leave += TextBox_Leave;
         //-----------------------------------------------------//
 
-
-
         emailTextBox.Location = new System.Drawing.Point(-1000, pictureBox.Bottom + 20);
         passwordTextBox.Location = new System.Drawing.Point(-1000, emailTextBox.Bottom + 30);
 
         Label emailLabel = new Label
         {
             Text = "Email:",
-            TextAlign = ContentAlignment.TopCenter,
-            Location = new System.Drawing.Point(120, emailTextBox.Top - 20),
+            TextAlign = ContentAlignment.TopLeft,
+            Location = new System.Drawing.Point(88, emailTextBox.Top - 20),
             ForeColor = System.Drawing.Color.White,
         };
 
         Label passwordLabel = new Label
         {
             Text = "Password:",
-            TextAlign = ContentAlignment.TopCenter,
-            Location = new System.Drawing.Point(120, emailLabel.Bottom + 25),
+            TextAlign = ContentAlignment.TopLeft,
+            Location = new System.Drawing.Point(88, emailTextBox.Bottom + 20),
             ForeColor = System.Drawing.Color.White,
         };
 
 
-        emailTextBox.Location = new System.Drawing.Point(80, pictureBox.Bottom + 20);
-        passwordTextBox.Location = new System.Drawing.Point(80, emailTextBox.Bottom + 30);
+        emailTextBox.Location = new System.Drawing.Point(90, emailLabel.Bottom);
+        passwordTextBox.Location = new System.Drawing.Point(90, passwordLabel.Bottom);
 
 
-        registerButton.Location = new System.Drawing.Point(100, passwordTextBox.Bottom + 30);
-        loginButton.Location = new System.Drawing.Point(200, passwordTextBox.Bottom + 30);
+        registerButton.Location = new System.Drawing.Point(88, passwordTextBox.Bottom + 30);
+        registerButton.Padding = new Padding(4, 2, 4, 2);
+        loginButton.Location = new System.Drawing.Point(88, registerButton.Bottom + 10);
+        loginButton.Padding = new Padding(4, 2, 4, 2);
 
 
         this.Controls.Add(emailLabel);
@@ -257,7 +258,7 @@ public class LoginForm : Form
 
 
 
-        this.Size = new System.Drawing.Size(400, loginButton.Bottom + 100);
+        this.Size = new System.Drawing.Size(400, loginButton.Bottom + 80);
 
 
         this.StartPosition = FormStartPosition.CenterScreen;
@@ -292,15 +293,15 @@ public class LoginForm : Form
     private void InitializeComponents()
     {
         this.Text = "Welcome to Big Bag";
+        this.FormBorderStyle = FormBorderStyle.Sizable;
         this.Size = new System.Drawing.Size(400, 200);
-        this.FormBorderStyle = FormBorderStyle.FixedDialog;
         this.MaximizeBox = false;
-        this.StartPosition = FormStartPosition.CenterScreen;
+        //this.StartPosition = FormStartPosition.CenterScreen;
 
         //------------------EMAIL TEXTBOX-----------------//
         emailTextBox = new TextBox
         {
-            Location = new System.Drawing.Point(120, 20),
+            Location = new System.Drawing.Point(200, 20),
             Size = new System.Drawing.Size(200, 20),
         };
 
@@ -315,8 +316,10 @@ public class LoginForm : Form
         //----------------REGISTER BUTTON-------------------//
         registerButton = new Button
         {
+
             Text = "Register",
-            Location = new System.Drawing.Point(50, passwordTextBox.Bottom + 20),
+            Location = new System.Drawing.Point(40, passwordTextBox.Bottom + 20),
+            Size = new System.Drawing.Size(200, 35),
         };
         registerButton.Click += new EventHandler(RegisterButtonClick);
 
@@ -325,6 +328,7 @@ public class LoginForm : Form
         {
             Text = "Login",
             Location = new System.Drawing.Point(200, passwordTextBox.Bottom + 20),
+            Size = new System.Drawing.Size(200, 35),
         };
         loginButton.Click += new EventHandler(LoginButtonClick);
 
@@ -394,11 +398,11 @@ public class LoginForm : Form
                 Font = new System.Drawing.Font("Arial", 18, FontStyle.Bold),
                 AutoSize = true,
             };
-                //---------------TRANSACTIONS----------------------------------//
+            //---------------TRANSACTIONS----------------------------------//
             Button displayTransactionsButton = CreateButton("Display Transactions", 60, 100);
-            displayTransactionsButton.BackColor = Color.FromArgb(46, 139, 87);  
-            displayTransactionsButton.ForeColor = Color.White;               
-            displayTransactionsButton.FlatStyle = FlatStyle.Flat;             
+            displayTransactionsButton.BackColor = Color.FromArgb(46, 139, 87);
+            displayTransactionsButton.ForeColor = Color.White;
+            displayTransactionsButton.FlatStyle = FlatStyle.Flat;
             displayTransactionsButton.Font = new Font("Arial", 12, FontStyle.Bold);
 
 
@@ -410,9 +414,9 @@ public class LoginForm : Form
             //-----------------------------------------------------------//
             //-----------------LOG OUT-------------------------------//
             Button logoutButton = CreateButton("Log Out", 280, 100);
-            logoutButton.BackColor = Color.FromArgb(192, 57, 43);  
-            logoutButton.ForeColor = Color.White;               
-            logoutButton.FlatStyle = FlatStyle.Flat;  
+            logoutButton.BackColor = Color.FromArgb(192, 57, 43);
+            logoutButton.ForeColor = Color.White;
+            logoutButton.FlatStyle = FlatStyle.Flat;
             logoutButton.Font = new Font("Arial", 12, FontStyle.Bold);
 
             logoutButton.Click += (sender, e) =>
@@ -425,9 +429,9 @@ public class LoginForm : Form
 
             //--------------------PROFILE BUTTON CUSTOMIZATIONS-----------------//
             Button profileButton = CreateButton("Profile Management", 280, 150);
-            profileButton.BackColor = Color.FromArgb(52, 73, 94);   
-            profileButton.ForeColor = Color.White;              
-            profileButton.FlatStyle = FlatStyle.Flat;            
+            profileButton.BackColor = Color.FromArgb(52, 73, 94);
+            profileButton.ForeColor = Color.White;
+            profileButton.FlatStyle = FlatStyle.Flat;
             profileButton.Font = new Font("Arial", 12, FontStyle.Bold);
             profileButton.Click += (sender, e) =>
             {
@@ -524,52 +528,52 @@ public class LoginForm : Form
 
     //---------------------PROFILE MANAGMENT----------------------//
     public class ProfileManagementForm : Form
-{
-    public ProfileManagementForm(string userEmail, string userPassword)
     {
-        InitializeComponents(userEmail, userPassword);
+        public ProfileManagementForm(string userEmail, string userPassword)
+        {
+            InitializeComponents(userEmail, userPassword);
+        }
+
+        private void InitializeComponents(string userEmail, string userPassword)
+        {
+            this.Text = "Profile Management";
+            this.Size = new System.Drawing.Size(300, 200);
+            this.StartPosition = FormStartPosition.CenterScreen;
+
+            TextBox emailTextBox = new TextBox
+            {
+                Text = userEmail,
+                Location = new System.Drawing.Point(120, 20),
+                Size = new System.Drawing.Size(200, 20),
+            };
+
+            TextBox passwordTextBox = new TextBox
+            {
+                Text = userPassword,
+                Location = new System.Drawing.Point(120, emailTextBox.Bottom + 20),
+                Size = new System.Drawing.Size(200, 20),
+                PasswordChar = '*',
+            };
+
+            Label emailLabel = new Label
+            {
+                Text = "Email:",
+                Location = new System.Drawing.Point(20, 20),
+                Font = new System.Drawing.Font("Arial", 12),
+            };
+
+            Label passwordLabel = new Label
+            {
+                Text = "Password:",
+                Location = new System.Drawing.Point(20, emailLabel.Bottom + 25),
+                Font = new System.Drawing.Font("Arial", 12),
+            };
+
+            this.Controls.Add(emailLabel);
+            this.Controls.Add(emailTextBox);
+            this.Controls.Add(passwordLabel);
+            this.Controls.Add(passwordTextBox);
+        }
     }
-
-    private void InitializeComponents(string userEmail, string userPassword)
-    {
-        this.Text = "Profile Management";
-        this.Size = new System.Drawing.Size(300, 200);
-        this.StartPosition = FormStartPosition.CenterScreen;
-
-        TextBox emailTextBox = new TextBox
-        {
-            Text = userEmail,
-            Location = new System.Drawing.Point(120, 20),
-            Size = new System.Drawing.Size(200, 20),
-        };
-
-        TextBox passwordTextBox = new TextBox
-        {
-            Text = userPassword,
-            Location = new System.Drawing.Point(120, emailTextBox.Bottom + 20),
-            Size = new System.Drawing.Size(200, 20),
-            PasswordChar = '*',
-        };
-
-        Label emailLabel = new Label
-        {
-            Text = "Email:",
-            Location = new System.Drawing.Point(20, 20),
-            Font = new System.Drawing.Font("Arial", 12),
-        };
-
-        Label passwordLabel = new Label
-        {
-            Text = "Password:",
-            Location = new System.Drawing.Point(20, emailLabel.Bottom + 25),
-            Font = new System.Drawing.Font("Arial", 12),
-        };
-
-        this.Controls.Add(emailLabel);
-        this.Controls.Add(emailTextBox); 
-        this.Controls.Add(passwordLabel);
-        this.Controls.Add(passwordTextBox); 
-    }
-}
     //--------------------------------------------------------------//
 }
