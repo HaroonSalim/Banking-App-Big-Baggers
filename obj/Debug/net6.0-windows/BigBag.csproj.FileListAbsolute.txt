@@ -1,0 +1,16 @@
+C:\Programming\University\FSE\BigBag\bin\Debug\net6.0-windows\BigBag.exe
+C:\Programming\University\FSE\BigBag\bin\Debug\net6.0-windows\BigBag.deps.json
+C:\Programming\University\FSE\BigBag\bin\Debug\net6.0-windows\BigBag.runtimeconfig.json
+C:\Programming\University\FSE\BigBag\bin\Debug\net6.0-windows\BigBag.dll
+C:\Programming\University\FSE\BigBag\bin\Debug\net6.0-windows\BigBag.pdb
+C:\Programming\University\FSE\BigBag\obj\Debug\net6.0-windows\BigBag.Form1.resources
+C:\Programming\University\FSE\BigBag\obj\Debug\net6.0-windows\BigBag.csproj.GenerateResource.cache
+C:\Programming\University\FSE\BigBag\obj\Debug\net6.0-windows\BigBag.GeneratedMSBuildEditorConfig.editorconfig
+C:\Programming\University\FSE\BigBag\obj\Debug\net6.0-windows\BigBag.AssemblyInfoInputs.cache
+C:\Programming\University\FSE\BigBag\obj\Debug\net6.0-windows\BigBag.AssemblyInfo.cs
+C:\Programming\University\FSE\BigBag\obj\Debug\net6.0-windows\BigBag.csproj.CoreCompileInputs.cache
+C:\Programming\University\FSE\BigBag\obj\Debug\net6.0-windows\BigBag.dll
+C:\Programming\University\FSE\BigBag\obj\Debug\net6.0-windows\refint\BigBag.dll
+C:\Programming\University\FSE\BigBag\obj\Debug\net6.0-windows\BigBag.pdb
+C:\Programming\University\FSE\BigBag\obj\Debug\net6.0-windows\BigBag.genruntimeconfig.cache
+C:\Programming\University\FSE\BigBag\obj\Debug\net6.0-windows\ref\BigBag.dll
