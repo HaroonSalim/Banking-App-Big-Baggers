@@ -2,16 +2,24 @@ using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 using System.Windows.Forms;
 
 public class UserManager
 {
-	private const string UserFilePath = "./database.txt";
+	private const string UserFilePath = "./database.json";
 
-	public void RegisterUser(string username, string password)
+	public void RegisterUser(string username, string email, string password)
 	{
+		//------------------CHECKING FOR USERNAME-------------------//
+		if (username.Length < 4 && username.Length > 20 && username != "")
+		{
+			MessageBox.Show("Username must be between 4 to 20 characters.");
+			return;
+		}
+
 		//------------------CHECKING FOR EMAIL FORMAT-------------------//
-		if (!IsEmailValid(username))
+		if (!IsEmailValid(email))
 		{
 			MessageBox.Show("Invalid email format.");
 			return;
@@ -27,30 +35,49 @@ public class UserManager
 		//------------------PASSWORD HASH GENERATION-------------------//
 		string passwordHash = GeneratePasswordHash(password);
 
-		var user = new User(username, passwordHash);
-		string userData = $"{user.Username}:{user.PasswordHash}";
+		// Read existing JSON data from the file
+		string jsonData = File.ReadAllText(UserFilePath);
 
-		File.AppendAllLines(UserFilePath, new[] { userData });
+		// Deserialize existing JSON data into a list of anonymous objects
+		List<object> userRecords = JsonConvert.DeserializeObject<List<object>>(jsonData) ?? new List<object>();
 
-		MessageBox.Show("Registration complete.");
+		// Create a new anonymous object to represent the current expense record
+		var user = new { username = username, email = email, password = passwordHash };
+
+		// Add the current expense record to the list
+		userRecords.Add(user);
+
+		// Serialize the updated list of expense records back to JSON
+		string updatedJsonData = JsonConvert.SerializeObject(userRecords, Formatting.Indented);
+
+		// Write the updated JSON data back to the file
+		File.WriteAllText(UserFilePath, updatedJsonData);
+
+		MessageBox.Show("Registration successful!");
 	}
 
-
 	//-------------------ALL THE LOGIN PROCEDURE FILE CHECKING---------------------//
-	public bool Login(string username, string password)
+	public bool Login(string username, string email, string password)
 	{
 		if (File.Exists(UserFilePath))
 		{
-			string[] lines = File.ReadAllLines(UserFilePath);
-			foreach (var line in lines)
-			{
-				string[] parts = line.Split(':');
-				if (parts.Length == 2)
-				{
-					string storedUsername = parts[0];
-					string storedPasswordHash = parts[1];
+			// Read existing JSON data from the file
+			string jsonData = File.ReadAllText(UserFilePath);
 
-					if (storedUsername == username && VerifyPasswordHash(password, storedPasswordHash))
+			var userRecords = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(jsonData) ?? new List<Dictionary<string, object>>();
+
+			foreach (var userRecordDict in userRecords)
+			{
+				if (userRecordDict.TryGetValue("username", out object storedUsernameObj) &&
+					userRecordDict.TryGetValue("email", out object storedEmailObj) && userRecordDict.TryGetValue("password", out object storedPasswordHashObj))
+				{
+					string storedUsername = storedUsernameObj as string;
+					string storedEmail = storedEmailObj as string;
+					string storedPasswordHash = storedPasswordHashObj as string;
+
+					// Check for null before proceeding
+					if (storedUsername != null && storedPasswordHash != null && storedEmail != null &&
+						storedUsername == username && storedEmail == email && VerifyPasswordHash(password, storedPasswordHash))
 					{
 						return true;
 					}
@@ -68,9 +95,7 @@ public class UserManager
 		return Regex.IsMatch(email, @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
 	}
 
-
 	//-------------------PASSWORD COMPLEXITY---------------------//
-
 	private bool IsPasswordComplex(string password)
 	{
 		if (password.Length < 8)
@@ -100,9 +125,6 @@ public class UserManager
 
 		return hasDigit && hasLower && hasUpper;
 	}
-
-
-
 
 	//----------------PASSWORD HASH---------------------//
 	private string GeneratePasswordHash(string password)

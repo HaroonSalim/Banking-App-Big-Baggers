@@ -27,7 +27,7 @@ public class ProfileManagementForm : Form
             Text = userPassword,
             Location = new System.Drawing.Point(120, emailTextBox.Bottom + 20),
             Size = new System.Drawing.Size(200, 20),
-            PasswordChar = '*',
+            // PasswordChar = '*',
         };
 
         Label emailLabel = new Label
