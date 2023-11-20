@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 public class UserManager
 {
-	private const string UserFilePath = "./userdataPG.txt";
+	private const string UserFilePath = "./database.txt";
 
 	public void RegisterUser(string username, string password)
 	{
