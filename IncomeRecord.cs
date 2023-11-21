@@ -3,11 +3,18 @@ using System.Drawing;
 using System.Windows.Forms;
 using Newtonsoft.Json;
 using System.IO;
+using static DashboardForm;
+
 
 public class IncomeRecordForm : Form
 {
-    public IncomeRecordForm()
+    private string email;
+    private readonly DataChangedEventHandler dataChangedCallback;
+
+    public IncomeRecordForm(string email, DataChangedEventHandler callback)
     {
+        this.email = email;
+        this.dataChangedCallback = callback;
         InitializeComponents();
     }
 
@@ -67,9 +74,8 @@ public class IncomeRecordForm : Form
 
         saveButton.Click += (sender, e) =>
         {
-            SaveIncomeRecord(amountTextBox.Text, datePicker.Value, categoryTextBox.Text);
-            MessageBox.Show("Income record saved!");
-            this.Close();
+            // string currentUser = "UsernameOfCurrentUser";  // Replace this with the actual username
+            SaveIncomeRecord(amountTextBox.Text, email);
         };
 
         this.Controls.Add(amountLabel);
@@ -81,17 +87,46 @@ public class IncomeRecordForm : Form
         this.Controls.Add(saveButton);
     }
 
-    private void SaveIncomeRecord(string amount, DateTime date, string category)
+    private void SaveIncomeRecord(string amount, string email)
     {
-        string filePath = "./IncomeRecords.json";
+        if (string.IsNullOrWhiteSpace(amount) || !decimal.TryParse(amount, out decimal parsedAmount) || parsedAmount <= 0)
+        {
+            MessageBox.Show("Invalid amount. Please enter a positive number.");
+            return;
+        }
 
-        // Create an anonymous object to represent the income record
-        var incomeRecord = new { Amount = amount, Date = date, Category = category };
+        string filePath = "./database.json";
 
-        // Serialize the income record to JSON
-        string record = JsonConvert.SerializeObject(incomeRecord);
+        try
+        {
+            string jsonData = File.ReadAllText(filePath);
+            List<UserInfo> users = JsonConvert.DeserializeObject<List<UserInfo>>(jsonData) ?? new List<UserInfo>();
 
-        // Append the JSON data to the file
-        File.AppendAllText(filePath, record + Environment.NewLine);
+            var user = users.FirstOrDefault(u => u.Email == email);
+            if (user == null)
+            {
+                MessageBox.Show("User not found.");
+                return;
+            }
+
+            if (user.Transactions == null)
+            {
+                user.Transactions = new List<int>();
+            }
+
+            // Since incomes are positive, we directly add the amount
+            user.Transactions.Add((int)parsedAmount);
+
+            string updatedJsonData = JsonConvert.SerializeObject(users, Formatting.Indented);
+            File.WriteAllText(filePath, updatedJsonData);
+
+            dataChangedCallback?.Invoke(this, EventArgs.Empty);
+            MessageBox.Show("Income record saved!");
+            this.Close();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("An error occurred: " + ex.Message);
+        }
     }
 }

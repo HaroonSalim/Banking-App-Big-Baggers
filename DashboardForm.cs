@@ -1,14 +1,18 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
+using Newtonsoft.Json;
 
 public class DashboardForm : Form
 {
-    public DashboardForm()
-    {
-        InitializeComponents();
-    }
+    private Label cardText;
+    public delegate void DataChangedEventHandler(object sender, EventArgs e);
+    public event DataChangedEventHandler DataChanged;
 
+    private void OnDataChanged()
+    {
+        DataChanged?.Invoke(this, EventArgs.Empty);
+    }
     private string username;
     private string email;
     private string password;
@@ -19,6 +23,7 @@ public class DashboardForm : Form
         this.email = email;
         this.password = password;
         InitializeComponents();
+        this.DataChanged += (s, e) => UpdateTotalAmount(email);
     }
 
     private void InitializeComponents()
@@ -28,94 +33,6 @@ public class DashboardForm : Form
         this.StartPosition = FormStartPosition.CenterScreen;
         this.BackColor = Color.FromArgb(44, 62, 80);  // Dark blue background
         this.Font = new Font("Arial", 12);
-
-        // Label welcomeLabel = new Label
-        // {
-        //     Text = "Welcome to Big Bag, " + username + "!",
-        //     Location = new System.Drawing.Point((ClientSize.Width - Text.Length) / 3, 20),
-        //     Font = new System.Drawing.Font("Arial", 18, FontStyle.Bold),
-        //     AutoSize = true,
-        // };
-
-        // //--------------------ADD INCOME BUTTON-----------------//
-        // Button addIncomeButton = CreateButton("Add Income", 280, 50);
-        // addIncomeButton.BackColor = Color.FromArgb(255, 193, 7); // Yellow
-        // addIncomeButton.ForeColor = Color.White;
-        // addIncomeButton.FlatStyle = FlatStyle.Flat;
-        // addIncomeButton.Font = new Font("Arial", 12, FontStyle.Bold);
-        // addIncomeButton.Click += (sender, e) =>
-        // {
-        //     IncomeRecordForm incomeRecordForm = new IncomeRecordForm();
-        //     incomeRecordForm.Show();
-        // };
-        // //--------------------------------------------------------//
-
-        // this.Controls.Add(addIncomeButton);
-
-
-        // //-------------------EXPENSE BUTTON---------------------//
-        // Button expenseButton = CreateButton("Add Expense", 60, 200);
-        // expenseButton.BackColor = Color.FromArgb(231, 76, 60);
-        // expenseButton.ForeColor = Color.White;
-        // expenseButton.FlatStyle = FlatStyle.Flat;
-        // expenseButton.Font = new Font("Arial", 12, FontStyle.Bold);
-
-        // expenseButton.Click += (sender, e) =>
-        // {
-        //     ExpenseRecordForm expenseForm = new ExpenseRecordForm();
-        //     expenseForm.Show();
-        // };
-        // //--------------------------------------------------------//
-
-        // this.Controls.Add(expenseButton);
-
-
-        // //---------------TRANSACTIONS----------------------------------//
-        // Button displayTransactionsButton = CreateButton("Display Transactions", 60, 100);
-        // displayTransactionsButton.BackColor = Color.FromArgb(46, 139, 87);
-        // displayTransactionsButton.ForeColor = Color.White;
-        // displayTransactionsButton.FlatStyle = FlatStyle.Flat;
-        // displayTransactionsButton.Font = new Font("Arial", 12, FontStyle.Bold);
-
-
-        // displayTransactionsButton.Click += (sender, e) =>
-        // {
-        //     TransactionsForm transactionsForm = new TransactionsForm();
-        //     transactionsForm.Show();
-        // };
-        // //-----------------------------------------------------------//
-        // //-----------------LOG OUT-------------------------------//
-        // Button logoutButton = CreateButton("Log Out", 280, 100);
-        // logoutButton.BackColor = Color.FromArgb(192, 57, 43);
-        // logoutButton.ForeColor = Color.White;
-        // logoutButton.FlatStyle = FlatStyle.Flat;
-        // logoutButton.Font = new Font("Arial", 12, FontStyle.Bold);
-
-        // logoutButton.Click += (sender, e) =>
-        // {
-        //     this.Close(); // Close the dashboard form
-        //     LoginForm loginForm = new LoginForm();
-        //     loginForm.Show(); // Show the login form
-        // };
-        // //----------------------------------------------//
-
-        // //--------------------PROFILE BUTTON CUSTOMIZATIONS-----------------//
-        // Button profileButton = CreateButton("Profile Management", 280, 150);
-        // profileButton.BackColor = Color.FromArgb(52, 73, 94);
-        // profileButton.ForeColor = Color.White;
-        // profileButton.FlatStyle = FlatStyle.Flat;
-        // profileButton.Font = new Font("Arial", 12, FontStyle.Bold);
-        // profileButton.Click += (sender, e) =>
-        // {
-        //     ProfileManagementForm profileForm = new ProfileManagementForm(email, password);
-        //     profileForm.Show();
-        // };
-        // //-------------------------------------------------------------------------//
-
-        // this.Controls.Add(welcomeLabel);
-        // this.Controls.Add(displayTransactionsButton);
-        // this.Controls.Add(logoutButton);
-        // this.Controls.Add(profileButton);
 
         // Main layout panel
         Panel mainPanel = new Panel
@@ -142,7 +59,7 @@ public class DashboardForm : Form
 
         displayTransactionsButton.Click += (sender, e) =>
         {
-            TransactionsForm transactionsForm = new TransactionsForm();
+            TransactionsForm transactionsForm = new TransactionsForm(email);
             transactionsForm.Show();
         };
 
@@ -189,14 +106,16 @@ public class DashboardForm : Form
         cardPanel.Controls.Add(cardTitle);
 
         // Content in contentCard panel
-        Label cardText = new Label
+        cardText = new Label
         {
-            Text = "USD " + 2000,
+            Text = "PKR ",
             AutoSize = true,
             Location = new Point(20, 20),
             Font = new Font("Arial", 32, FontStyle.Bold)
         };
         contentCard.Controls.Add(cardText);
+        UpdateTotalAmount(email);
+        cardText.Refresh();
 
         // Place buttons horizontally
         Button incomeButton = new Button { Text = "Add Income", Size = new Size(222, 50), Location = new Point(20, cardText.Bottom + 10) };
@@ -207,14 +126,18 @@ public class DashboardForm : Form
         // Add event handlers
         incomeButton.Click += (sender, e) =>
         {
-            IncomeRecordForm incomeRecordForm = new IncomeRecordForm();
+            IncomeRecordForm incomeRecordForm = new IncomeRecordForm(email, DataChanged);
             incomeRecordForm.Show();
+            UpdateTotalAmount(email);
+            cardText.Refresh();
         };
 
         expenseButton.Click += (sender, e) =>
         {
-            ExpenseRecordForm expenseForm = new ExpenseRecordForm();
+            ExpenseRecordForm expenseForm = new ExpenseRecordForm(email, DataChanged);
             expenseForm.Show();
+            UpdateTotalAmount(email);
+            cardText.Refresh();
         };
 
         // Add a transaction list with 5 dummy transactions
@@ -245,31 +168,10 @@ public class DashboardForm : Form
             BackColor = Color.White
         };
 
-        // Add 5 dummy transactions
-        for (int i = 0; i < 5; i++)
-        {
-            Panel transaction = new Panel
-            {
-                Size = new Size(500, 50),
-                Location = new Point(0, i * 50),
-                BackColor = Color.LightGray
-            };
-
-            Label transactionText = new Label
-            {
-                Text = "Transaction " + (i + 1),
-                AutoSize = true,
-                Location = new Point(20, 20),
-                Font = new Font("Arial", 12),
-                ForeColor = Color.Black
-            };
-
-            transaction.Controls.Add(transactionText);
-            transactionListContent.Controls.Add(transaction);
-        }
-
         transactionList.Controls.Add(transactionListContent);
-        cardPanel.Controls.Add(transactionList);
+
+        // Call the method to display top transactions
+        DisplayTopTransactions(transactionListContent, email);
     }
 
 
@@ -287,7 +189,7 @@ public class DashboardForm : Form
 
     private void DisplayTransactionsButton_Click(object sender, EventArgs e)
     {
-        TransactionsForm transactionsForm = new TransactionsForm();
+        TransactionsForm transactionsForm = new TransactionsForm(email);
         transactionsForm.Show();
     }
 
@@ -303,5 +205,78 @@ public class DashboardForm : Form
         ProfileManagementForm profileForm = new ProfileManagementForm(email, password);
         profileForm.Show();
     }
+
+    private void DisplayTopTransactions(Panel transactionListContent, string email)
+    {
+        string filePath = "./database.json";
+        try
+        {
+            string jsonData = File.ReadAllText(filePath);
+            List<UserInfo> users = JsonConvert.DeserializeObject<List<UserInfo>>(jsonData) ?? new List<UserInfo>();
+
+            var user = users.FirstOrDefault(u => u.Email == email);
+            if (user == null || user.Transactions == null || !user.Transactions.Any())
+            {
+                MessageBox.Show("No transactions found for this user.");
+                return;
+            }
+
+            // Clear existing items
+            transactionListContent.Controls.Clear();
+
+            // Fetch top 5 transactions
+            var topTransactions = user.Transactions.Take(5).ToList();
+
+            // Display each transaction
+            for (int i = 0; i < topTransactions.Count; i++)
+            {
+                Label transactionLabel = new Label
+                {
+                    Text = (topTransactions[i] > 0 ? "Income: $" : "Expense: $") + Math.Abs(topTransactions[i]),
+                    AutoSize = true,
+                    Location = new Point(10, i * 30), // Adjust location as needed
+                    Font = new Font("Arial", 10),
+                    ForeColor = Color.Black
+                };
+
+                transactionListContent.Controls.Add(transactionLabel);
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("An error occurred while loading transactions: " + ex.Message);
+        }
+    }
+
+
+    private void UpdateTotalAmount(string email)
+    {
+        string filePath = "./database.json";
+        try
+        {
+            string jsonData = File.ReadAllText(filePath);
+            List<UserInfo> users = JsonConvert.DeserializeObject<List<UserInfo>>(jsonData) ?? new List<UserInfo>();
+
+            var user = users.FirstOrDefault(u => u.Email == email);
+            if (user == null || user.Transactions == null || !user.Transactions.Any())
+            {
+                MessageBox.Show("No transactions found for this user.");
+                return;
+            }
+
+            // Calculate the sum of all transactions
+            int totalAmount = user.Transactions.Sum();
+
+            // Update the cardText label with the total amount
+            // Assuming cardText is a Label control already defined in your DashboardForm
+            cardText.Text = "PKR " + totalAmount;
+            cardText.Refresh();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("An error occurred while calculating the total amount: " + ex.Message);
+        }
+    }
+
 
 }

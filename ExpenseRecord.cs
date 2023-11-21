@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using Newtonsoft.Json;
 using System.IO;
+using static DashboardForm;
 
 public class ExpenseRecordForm : Form
 {
@@ -11,9 +12,14 @@ public class ExpenseRecordForm : Form
     private TextBox categoryTextBox;
     private TextBox descriptionTextBox;
     private Button saveButton;
+    private string email;
+    private readonly DataChangedEventHandler dataChangedCallback;
 
-    public ExpenseRecordForm()
+
+    public ExpenseRecordForm(string email, DataChangedEventHandler callback)
     {
+        this.email = email;
+        this.dataChangedCallback = callback;
         InitializeComponents();
     }
 
@@ -83,7 +89,11 @@ public class ExpenseRecordForm : Form
             Size = new System.Drawing.Size(150, 30),
             Font = new System.Drawing.Font("Arial", 12),
         };
-        saveButton.Click += new EventHandler(SaveButton_Click);
+        saveButton.Click += (sender, e) =>
+        {
+            // string currentUser = "UsernameOfCurrentUser";  // Replace this with the actual username
+            SaveButton_Click(amountTextBox.Text, email);
+        };
 
         this.Controls.Add(amountLabel);
         this.Controls.Add(amountTextBox);
@@ -96,37 +106,46 @@ public class ExpenseRecordForm : Form
         this.Controls.Add(saveButton);
     }
 
-    private void SaveButton_Click(object sender, EventArgs e)
+    private void SaveButton_Click(string amount, string email)
     {
+        if (string.IsNullOrWhiteSpace(amount) || !decimal.TryParse(amount, out decimal parsedAmount) || parsedAmount <= 0)
+        {
+            MessageBox.Show("Invalid amount. Please enter a positive number.");
+            return;
+        }
+
+        string filePath = "./database.json";
+
         try
         {
-            // Use a verbatim string literal to simplify the path
-            string expenseFilePath = "./ExpenseRecords.json";
+            string jsonData = File.ReadAllText(filePath);
+            List<UserInfo> users = JsonConvert.DeserializeObject<List<UserInfo>>(jsonData) ?? new List<UserInfo>();
 
-            // Read existing JSON data from the file
-            string jsonData = File.ReadAllText(expenseFilePath);
+            var user = users.FirstOrDefault(u => u.Email == email);
+            if (user == null)
+            {
+                MessageBox.Show("User not found.");
+                return;
+            }
 
-            // Deserialize existing JSON data into a list of anonymous objects
-            List<object> expenseRecords = JsonConvert.DeserializeObject<List<object>>(jsonData) ?? new List<object>();
+            if (user.Transactions == null)
+            {
+                user.Transactions = new List<int>();
+            }
 
-            // Create a new anonymous object to represent the current expense record
-            var expenseRecord = new { Amount = amountTextBox.Text, Date = datePicker.Value, Category = categoryTextBox.Text, Description = descriptionTextBox.Text };
+            // Expenses are negative, so we add the amount as a negative value
+            user.Transactions.Add(-(int)parsedAmount);
 
-            // Add the current expense record to the list
-            expenseRecords.Add(expenseRecord);
+            string updatedJsonData = JsonConvert.SerializeObject(users, Formatting.Indented);
+            File.WriteAllText(filePath, updatedJsonData);
 
-            // Serialize the updated list of expense records back to JSON
-            string updatedJsonData = JsonConvert.SerializeObject(expenseRecords, Formatting.Indented);
-
-            // Write the updated JSON data back to the file
-            File.WriteAllText(expenseFilePath, updatedJsonData);
-
-            MessageBox.Show("Expense saved!");
+            dataChangedCallback?.Invoke(this, EventArgs.Empty);
+            MessageBox.Show("Expense record saved!");
             this.Close();
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"An error occurred while saving the expense: {ex.Message}");
+            MessageBox.Show("An error occurred: " + ex.Message);
         }
     }
 
