@@ -8,6 +8,6 @@ public class Program
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
         Application.Run(new LoginForm());
-        // Application.Run(new DashboardForm("Ammar", "email", "password"));
+        //Application.Run(new DashboardForm("Ammar", "email", "password"));
     }
 }

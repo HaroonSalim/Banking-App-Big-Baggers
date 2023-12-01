@@ -4,22 +4,24 @@ using System.Windows.Forms;
 
 public class ProfileManagementForm : Form
 {
-    public ProfileManagementForm(string userEmail, string userPassword, string username)
+    public ProfileManagementForm(string userEmail, string userPassword, string usern)
     {
-        InitializeComponents(userEmail, userPassword,username);
+        InitializeComponents(userEmail, userPassword, usern);
     }
 
-    private void InitializeComponents(string userEmail, string userPassword,string username)
+    private void InitializeComponents(string userEmail, string userPassword, string user)
     {
         this.Text = "Profile Management";
         this.Size = new System.Drawing.Size(300, 200);
         this.StartPosition = FormStartPosition.CenterScreen;
+
 
         TextBox emailTextBox = new TextBox
         {
             Text = userEmail,
             Location = new System.Drawing.Point(120, 20),
             Size = new System.Drawing.Size(200, 20),
+            ReadOnly = true,
         };
 
         TextBox passwordTextBox = new TextBox
@@ -27,8 +29,20 @@ public class ProfileManagementForm : Form
             Text = userPassword,
             Location = new System.Drawing.Point(120, emailTextBox.Bottom + 20),
             Size = new System.Drawing.Size(200, 20),
+            ReadOnly = true,
             // PasswordChar = '*',
+            
         };
+
+        
+        TextBox usernameTextBox = new TextBox
+        {
+            Text = user,
+            Location = new System.Drawing.Point(120, passwordTextBox.Bottom + 20),
+            Size = new System.Drawing.Size(200, 20),
+            ReadOnly = true,
+        };
+
 
         Label emailLabel = new Label
         {
@@ -44,9 +58,22 @@ public class ProfileManagementForm : Form
             Font = new System.Drawing.Font("Arial", 12),
         };
 
+        
+        Label usernameLabel = new Label
+        {
+            Text = "Username:",
+            Location = new System.Drawing.Point(20, passwordLabel.Bottom + 25),
+            Font = new System.Drawing.Font("Arial", 12),
+        };
+        
+
         this.Controls.Add(emailLabel);
         this.Controls.Add(emailTextBox);
         this.Controls.Add(passwordLabel);
         this.Controls.Add(passwordTextBox);
+        this.Controls.Add(usernameLabel);
+        this.Controls.Add(usernameTextBox);
+        
     }
+    
 }

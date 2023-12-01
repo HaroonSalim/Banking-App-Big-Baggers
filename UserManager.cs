@@ -34,6 +34,7 @@ public class UserManager
 
 		//------------------PASSWORD HASH GENERATION-------------------//
 		string passwordHash = GeneratePasswordHash(password);
+		
 
 		// // Read existing JSON data from the file
 		// string jsonData = File.ReadAllText(UserFilePath);
