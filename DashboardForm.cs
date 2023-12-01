@@ -53,9 +53,11 @@ public class DashboardForm : Form
         Button displayTransactionsButton = new Button { Text = "Transactions", Size = new Size(tabsPanel.Width, 60), Location = new Point(0, 0) };
         Button profileButton = new Button { Text = "Profile", Size = new Size(tabsPanel.Width, 60), Location = new Point(0, 60) };
         Button logoutButton = new Button { Text = "Logout", Size = new Size(tabsPanel.Width, 60), Location = new Point(0, 120) };
+        Button budgetButton = new Button { Text = "Budget", Size = new Size(tabsPanel.Width, 60), Location = new Point(0, 180) }; 
         tabsPanel.Controls.Add(displayTransactionsButton);
         tabsPanel.Controls.Add(profileButton);
         tabsPanel.Controls.Add(logoutButton);
+        tabsPanel.Controls.Add(budgetButton);
 
         displayTransactionsButton.Click += (sender, e) =>
         {
@@ -65,7 +67,7 @@ public class DashboardForm : Form
 
         profileButton.Click += (sender, e) =>
         {
-            ProfileManagementForm profileForm = new ProfileManagementForm(email, password);
+            ProfileManagementForm profileForm = new ProfileManagementForm(email, password,username);
             profileForm.Show();
         };
 
@@ -74,6 +76,14 @@ public class DashboardForm : Form
             this.Close(); // Close the dashboard form
             LoginForm loginForm = new LoginForm();
             loginForm.Show(); // Show the login form
+        };
+
+        budgetButton.Click += (sender, e) =>
+        {
+            BudgetForm budgetForm = new BudgetForm(email, DataChanged);
+            budgetForm.Show();
+            UpdateTotalAmount(email);
+            cardText.Refresh();
         };
 
         // Card panel
@@ -134,7 +144,8 @@ public class DashboardForm : Form
 
         expenseButton.Click += (sender, e) =>
         {
-            ExpenseRecordForm expenseForm = new ExpenseRecordForm(email, DataChanged);
+            decimal userBudget = GetUserBudget(email);
+            ExpenseRecordForm expenseForm = new ExpenseRecordForm(email,userBudget,DataChanged);
             expenseForm.Show();
             UpdateTotalAmount(email);
             cardText.Refresh();
@@ -202,7 +213,7 @@ public class DashboardForm : Form
 
     private void ProfileButton_Click(object sender, EventArgs e)
     {
-        ProfileManagementForm profileForm = new ProfileManagementForm(email, password);
+        ProfileManagementForm profileForm = new ProfileManagementForm(email, password,username);
         profileForm.Show();
     }
 
@@ -276,6 +287,30 @@ public class DashboardForm : Form
         {
             MessageBox.Show("An error occurred while calculating the total amount: " + ex.Message);
         }
+    }
+
+
+    private decimal GetUserBudget(string email)
+    {
+        string filePath = "./database.json";
+        try
+        {
+            string jsonData = File.ReadAllText(filePath);
+            List<UserInfo> users = JsonConvert.DeserializeObject<List<UserInfo>>(jsonData) ?? new List<UserInfo>();
+
+            var user = users.FirstOrDefault(u => u.Email == email);
+            if (user != null)
+            {
+                return user.Budget;
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("An error occurred while getting user's budget: " + ex.Message);
+        }
+
+        // Return a default value if unable to get the budget
+        return 0;
     }
 
 
