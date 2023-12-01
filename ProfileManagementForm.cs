@@ -4,12 +4,12 @@ using System.Windows.Forms;
 
 public class ProfileManagementForm : Form
 {
-    public ProfileManagementForm(string userEmail, string userPassword)
+    public ProfileManagementForm(string userEmail, string userPassword, string username)
     {
-        InitializeComponents(userEmail, userPassword);
+        InitializeComponents(userEmail, userPassword,username);
     }
 
-    private void InitializeComponents(string userEmail, string userPassword)
+    private void InitializeComponents(string userEmail, string userPassword,string username)
     {
         this.Text = "Profile Management";
         this.Size = new System.Drawing.Size(300, 200);
