@@ -15,11 +15,14 @@ public class ExpenseRecordForm : Form
     private string email;
     private readonly DataChangedEventHandler dataChangedCallback;
 
+    private readonly decimal budget;
 
-    public ExpenseRecordForm(string email, DataChangedEventHandler callback)
+
+    public ExpenseRecordForm(string email,decimal budget ,DataChangedEventHandler callback)
     {
         this.email = email;
         this.dataChangedCallback = callback;
+        this.budget = budget;
         InitializeComponents();
     }
 
@@ -125,6 +128,12 @@ public class ExpenseRecordForm : Form
             if (user == null)
             {
                 MessageBox.Show("User not found.");
+                return;
+            }
+            
+            if (user.Budget < Math.Abs(parsedAmount))
+            {
+                MessageBox.Show("Expense exceeds the budget. Cannot save.");
                 return;
             }
 
