@@ -54,10 +54,14 @@ public class DashboardForm : Form
         Button profileButton = new Button { Text = "Profile", Size = new Size(tabsPanel.Width, 60), Location = new Point(0, 60) };
         Button logoutButton = new Button { Text = "Logout", Size = new Size(tabsPanel.Width, 60), Location = new Point(0, 120) };
         Button budgetButton = new Button { Text = "Budget", Size = new Size(tabsPanel.Width, 60), Location = new Point(0, 180) }; 
+        Button analyticsButton = new Button { Text = "Analytics", Size = new Size(tabsPanel.Width, 60), Location = new Point(0, 240) };
         tabsPanel.Controls.Add(displayTransactionsButton);
         tabsPanel.Controls.Add(profileButton);
         tabsPanel.Controls.Add(logoutButton);
         tabsPanel.Controls.Add(budgetButton);
+        tabsPanel.Controls.Add(analyticsButton);
+
+        // will the analytics button be visible to all?: Yes
 
         displayTransactionsButton.Click += (sender, e) =>
         {
@@ -84,6 +88,12 @@ public class DashboardForm : Form
             budgetForm.Show();
             UpdateTotalAmount(email);
             cardText.Refresh();
+        };
+
+        analyticsButton.Click += (sender, e) =>
+        {
+            AnalyticsForm analyticsForm = new AnalyticsForm(username);
+            analyticsForm.Show();
         };
 
         // Card panel
