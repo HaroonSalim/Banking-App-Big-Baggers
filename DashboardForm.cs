@@ -55,13 +55,14 @@ public class DashboardForm : Form
         Button logoutButton = new Button { Text = "Logout", Size = new Size(tabsPanel.Width, 60), Location = new Point(0, 120) };
         Button budgetButton = new Button { Text = "Budget", Size = new Size(tabsPanel.Width, 60), Location = new Point(0, 180) }; 
         Button analyticsButton = new Button { Text = "Analytics", Size = new Size(tabsPanel.Width, 60), Location = new Point(0, 240) };
+        Button currencyConversionButton = new Button { Text = "Currency Conversion", Size = new Size(tabsPanel.Width, 60), Location = new Point(0, 300) };
         tabsPanel.Controls.Add(displayTransactionsButton);
         tabsPanel.Controls.Add(profileButton);
         tabsPanel.Controls.Add(logoutButton);
+        tabsPanel.Controls.Add(currencyConversionButton);
         tabsPanel.Controls.Add(budgetButton);
         tabsPanel.Controls.Add(analyticsButton);
 
-        // will the analytics button be visible to all?: Yes
 
         displayTransactionsButton.Click += (sender, e) =>
         {
@@ -94,6 +95,12 @@ public class DashboardForm : Form
         {
             AnalyticsForm analyticsForm = new AnalyticsForm(username);
             analyticsForm.Show();
+        };
+
+        currencyConversionButton.Click += (sender, e) =>
+        {
+            CurrencyConverterForm conversionForm = new CurrencyConverterForm();
+            conversionForm.Show();
         };
 
         // Card panel

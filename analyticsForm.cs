@@ -67,11 +67,11 @@ public class AnalyticsForm : Form
 
     private UserInfo GetUserData(string username)
     {
-        
+        // Replace this with your logic to read data from the JSON file
         string json = System.IO.File.ReadAllText("database.json");
         List<UserInfo> users = Newtonsoft.Json.JsonConvert.DeserializeObject<List<UserInfo>>(json);
 
-       
+        // Find the user with the specified username
         UserInfo user = users.FirstOrDefault(u => u.Username.Trim().Equals(username.Trim(), StringComparison.OrdinalIgnoreCase));
 
         return user;
