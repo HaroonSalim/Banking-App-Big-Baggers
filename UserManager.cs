@@ -1,9 +1,6 @@
-using System;
-using System.IO;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
-using System.Windows.Forms;
 
 public class UserManager
 {
@@ -34,25 +31,6 @@ public class UserManager
 
 		//------------------PASSWORD HASH GENERATION-------------------//
 		string passwordHash = GeneratePasswordHash(password);
-		
-
-		// // Read existing JSON data from the file
-		// string jsonData = File.ReadAllText(UserFilePath);
-
-		// // Deserialize existing JSON data into a list of anonymous objects
-		// List<object> userRecords = JsonConvert.DeserializeObject<List<object>>(jsonData) ?? new List<object>();
-
-		// // Create a new anonymous object to represent the current expense record
-		// var user = new { username = username, email = email, password = passwordHash };
-
-		// // Add the current expense record to the list
-		// userRecords.Add(user);
-
-		// // Serialize the updated list of expense records back to JSON
-		// string updatedJsonData = JsonConvert.SerializeObject(userRecords, Formatting.Indented);
-
-		// // Write the updated JSON data back to the file
-		// File.WriteAllText(UserFilePath, updatedJsonData);
 
 		string jsonData = File.ReadAllText(UserFilePath);
 		List<UserInfo> users = JsonConvert.DeserializeObject<List<UserInfo>>(jsonData) ?? new List<UserInfo>();
@@ -69,32 +47,6 @@ public class UserManager
 	//-------------------ALL THE LOGIN PROCEDURE FILE CHECKING---------------------//
 	public bool Login(string username, string email, string password)
 	{
-		// if (File.Exists(UserFilePath))
-		// {
-		// 	// Read existing JSON data from the file
-		// 	string jsonData = File.ReadAllText(UserFilePath);
-
-		// 	var userRecords = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(jsonData) ?? new List<Dictionary<string, object>>();
-
-		// 	foreach (var userRecordDict in userRecords)
-		// 	{
-		// 		if (userRecordDict.TryGetValue("username", out object storedUsernameObj) &&
-		// 			userRecordDict.TryGetValue("email", out object storedEmailObj) && userRecordDict.TryGetValue("password", out object storedPasswordHashObj))
-		// 		{
-		// 			string storedUsername = storedUsernameObj as string;
-		// 			string storedEmail = storedEmailObj as string;
-		// 			string storedPasswordHash = storedPasswordHashObj as string;
-
-		// 			// Check for null before proceeding
-		// 			if (storedUsername != null && storedPasswordHash != null && storedEmail != null &&
-		// 				storedUsername == username && storedEmail == email && VerifyPasswordHash(password, storedPasswordHash))
-		// 			{
-		// 				return true;
-		// 			}
-		// 		}
-		// 	}
-		// }
-
 		try
 		{
 			string jsonData = File.ReadAllText(UserFilePath);

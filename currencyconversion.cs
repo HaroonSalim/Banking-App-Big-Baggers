@@ -13,9 +13,6 @@ public class CurrencyConverterForm : Form
     private ComboBox fromCurrencyComboBox;
     private ComboBox toCurrencyComboBox;
     private Button convertButton;
-    
-
-    
 
     // Dictionary to store dummy conversion rates
     private Dictionary<string, Dictionary<string, decimal>> conversionRates;
