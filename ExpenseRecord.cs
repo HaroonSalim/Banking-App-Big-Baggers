@@ -18,7 +18,7 @@ public class ExpenseRecordForm : Form
     private readonly decimal budget;
 
 
-    public ExpenseRecordForm(string email,decimal budget ,DataChangedEventHandler callback)
+    public ExpenseRecordForm(string email, decimal budget, DataChangedEventHandler callback)
     {
         this.email = email;
         this.dataChangedCallback = callback;
@@ -109,6 +109,7 @@ public class ExpenseRecordForm : Form
         this.Controls.Add(saveButton);
     }
 
+    //Updated
     private void SaveButton_Click(string amount, string email)
     {
         if (string.IsNullOrWhiteSpace(amount) || !decimal.TryParse(amount, out decimal parsedAmount) || parsedAmount <= 0)
@@ -130,7 +131,7 @@ public class ExpenseRecordForm : Form
                 MessageBox.Show("User not found.");
                 return;
             }
-            
+
             if (user.Budget < Math.Abs(parsedAmount))
             {
                 MessageBox.Show("Expense exceeds the budget. Cannot save.");
@@ -139,11 +140,15 @@ public class ExpenseRecordForm : Form
 
             if (user.Transactions == null)
             {
-                user.Transactions = new List<int>();
+                user.Transactions = new List<TransactionInfo>();
             }
 
             // Expenses are negative, so we add the amount as a negative value
-            user.Transactions.Add(-(int)parsedAmount);
+            user.Transactions.Add(new TransactionInfo
+            {
+                Amount = -parsedAmount,
+                Date = DateTime.UtcNow // Use UTC time for consistency
+            });
 
             string updatedJsonData = JsonConvert.SerializeObject(users, Formatting.Indented);
             File.WriteAllText(filePath, updatedJsonData);

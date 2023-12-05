@@ -33,7 +33,7 @@ public class AnalyticsForm : Form
         var transactions = user.Transactions;
 
         // Convert transactions to double[]
-        double[] transactionValues = transactions.Select(t => (double)t).ToArray();
+        double[] transactionValues = transactions.Select(t => (double)t.Amount).ToArray();
 
         // Create a ScottPlot.WinFormsPlot
         var winFormsPlot = new ScottPlot.FormsPlot();
@@ -67,7 +67,6 @@ public class AnalyticsForm : Form
 
     private UserInfo GetUserData(string username)
     {
-        // Replace this with your logic to read data from the JSON file
         string json = System.IO.File.ReadAllText("database.json");
         List<UserInfo> users = Newtonsoft.Json.JsonConvert.DeserializeObject<List<UserInfo>>(json);
 

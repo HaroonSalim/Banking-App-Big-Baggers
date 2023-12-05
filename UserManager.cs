@@ -35,7 +35,14 @@ public class UserManager
 		string jsonData = File.ReadAllText(UserFilePath);
 		List<UserInfo> users = JsonConvert.DeserializeObject<List<UserInfo>>(jsonData) ?? new List<UserInfo>();
 
-		var newUser = new UserInfo { Username = username, Email = email, Password = passwordHash, Transactions = new List<int>() };
+		var newUser = new UserInfo
+		{
+			Username = username,
+			Email = email,
+			Password = passwordHash,
+			Transactions = new List<TransactionInfo>() // Use the new TransactionInfo structure
+		};
+
 		users.Add(newUser);
 
 		string updatedJsonData = JsonConvert.SerializeObject(users, Formatting.Indented);

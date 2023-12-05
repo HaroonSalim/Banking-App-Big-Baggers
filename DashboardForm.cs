@@ -47,7 +47,7 @@ public class DashboardForm : Form
         tabsPanel.Paint += TabsPanel_Paint;
 
         // Adding tabs
-        string[] buttonNames = { "Transactions", "Budget", "Analytics", "Currency Conversion", "Profile", "Logout"};
+        string[] buttonNames = { "Transactions", "Budget", "Analytics", "Currency Conversion", "Profile", "Logout" };
         EventHandler[] eventHandlers = { DisplayTransactionsButton_Click, ProfileButton_Click, LogoutButton_Click, BudgetButton_Click, AnalyticsButton_Click, CurrencyConversionButton_Click };
 
         for (int i = 0; i < buttonNames.Length; i++)
@@ -279,6 +279,8 @@ public class DashboardForm : Form
         AnalyticsForm analyticsForm = new AnalyticsForm(username);
         analyticsForm.Show();
     }
+
+    //updated Display top transaction
     private void DisplayTopTransactions(Panel transactionListContent, string email)
     {
         string filePath = "./database.json";
@@ -300,9 +302,10 @@ public class DashboardForm : Form
 
             for (int i = 0; i < topTransactions.Count; i++)
             {
+                var transaction = topTransactions[i];
                 Label transactionLabel = new Label
                 {
-                    Text = (topTransactions[i] > 0 ? "Income: $" : "Expense: $") + Math.Abs(topTransactions[i]),
+                    Text = $"{(transaction.Amount > 0 ? "Income: $" : "Expense: $")}{Math.Abs(transaction.Amount)} on {transaction.Date.ToShortDateString()}",
                     AutoSize = false,
                     Size = new Size(transactionListContent.Width, labelHeight),
                     Location = new Point(0, i * labelHeight),
@@ -326,11 +329,12 @@ public class DashboardForm : Form
         catch (Exception ex)
         {
             MessageBox.Show("An error occurred while loading transactions: " + ex.Message);
-            // Consider adding a debug message or breakpoint here
         }
 
         transactionListContent.Refresh();
     }
+
+    //Updated function
     private void UpdateTotalAmount(string email)
     {
         string filePath = "./database.json";
@@ -346,11 +350,11 @@ public class DashboardForm : Form
                 return;
             }
 
-            // Calculate the sum of all transactions
-            int totalAmount = user.Transactions.Sum();
+            // Calculate the sum of all transaction amounts
+            decimal totalAmount = user.Transactions.Sum(transaction => transaction.Amount);
 
             // Update the cardText label with the total amount
-            cardText.Text = "PKR " + totalAmount;
+            cardText.Text = $"PKR {totalAmount:N2}";
             cardText.Refresh();
         }
         catch (Exception ex)

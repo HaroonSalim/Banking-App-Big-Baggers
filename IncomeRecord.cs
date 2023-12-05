@@ -87,6 +87,7 @@ public class IncomeRecordForm : Form
         this.Controls.Add(saveButton);
     }
 
+    // Update SaveIncomeRecord method
     private void SaveIncomeRecord(string amount, string email)
     {
         if (string.IsNullOrWhiteSpace(amount) || !decimal.TryParse(amount, out decimal parsedAmount) || parsedAmount <= 0)
@@ -111,11 +112,15 @@ public class IncomeRecordForm : Form
 
             if (user.Transactions == null)
             {
-                user.Transactions = new List<int>();
+                user.Transactions = new List<TransactionInfo>();
             }
 
-            // Since incomes are positive, we directly add the amount
-            user.Transactions.Add((int)parsedAmount);
+            // Update the Transactions list
+            user.Transactions.Add(new TransactionInfo
+            {
+                Amount = parsedAmount,
+                Date = DateTime.UtcNow // Use UTC time for consistency
+            });
 
             string updatedJsonData = JsonConvert.SerializeObject(users, Formatting.Indented);
             File.WriteAllText(filePath, updatedJsonData);

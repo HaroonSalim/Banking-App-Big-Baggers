@@ -45,10 +45,19 @@ public class TransactionsForm : Form
                 return;
             }
 
-            foreach (int transaction in user.Transactions)
+            foreach (var transaction in user.Transactions)
             {
-                string transactionType = transaction > 0 ? "Income" : "Expense";
-                listBox.Items.Add($"{transactionType}: PKR {Math.Abs(transaction):N2}");
+                if (transaction is TransactionInfo newTransaction)
+                {
+                    string transactionType = newTransaction.Amount >= 0 ? "Income" : "Expense";
+                    string transactionAmount = $"{Math.Abs(newTransaction.Amount):N2} on {newTransaction.Date:yyyy-MM-dd}";
+                    listBox.Items.Add($"{transactionType}: PKR {transactionAmount}");
+                }
+                else
+                {
+                    // Handle unsupported format or ignore old transactions
+                    continue;
+                }
             }
         }
         catch (Exception ex)
@@ -56,4 +65,8 @@ public class TransactionsForm : Form
             MessageBox.Show("An error occurred while loading transactions: " + ex.Message);
         }
     }
+
 }
+
+
+

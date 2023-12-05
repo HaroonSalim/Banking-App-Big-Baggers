@@ -56,6 +56,7 @@ public class BudgetForm : Form
         this.Controls.Add(saveBudgetButton);
     }
 
+    // Update SaveBudget method
     private void SaveBudget(string budget, string email)
     {
         if (string.IsNullOrWhiteSpace(budget) || !decimal.TryParse(budget, out decimal parsedBudget) || parsedBudget <= 0)
@@ -71,7 +72,6 @@ public class BudgetForm : Form
             string jsonData = File.ReadAllText(filePath);
             List<UserInfo> users = JsonConvert.DeserializeObject<List<UserInfo>>(jsonData) ?? new List<UserInfo>();
 
-            
             var user = users.FirstOrDefault(u => u.Email == email);
             if (user != null)
             {
@@ -81,7 +81,6 @@ public class BudgetForm : Form
             {
                 MessageBox.Show("User not found.");
             }
-            
 
             string updatedJsonData = JsonConvert.SerializeObject(users, Formatting.Indented);
             File.WriteAllText(filePath, updatedJsonData);
