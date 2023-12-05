@@ -1,0 +1,38 @@
+[
+  {
+    "Username": "AmmarKashif",
+    "Email": "ammar@gmail.com",
+    "Password": "84k/Sujd51bXtCywfKH727xCK3Bh1tV+EZ8BA4oz255Wpyzk",
+    "Transactions": [
+      {
+        "Amount": 15000,
+        "Date": "2023-12-05T14:11:09.5511636Z"
+      },
+      {
+        "Amount": 5000,
+        "Date": "2023-12-05T14:13:31.5097708Z"
+      },
+      {
+        "Amount": 5000,
+        "Date": "2023-12-05T14:15:45.4502547Z"
+      },
+      {
+        "Amount": -2000,
+        "Date": "2023-12-05T14:17:12.1329649Z"
+      },
+      {
+        "Amount": -500,
+        "Date": "2023-12-05T14:27:13.8183349Z"
+      },
+      {
+        "Amount": 50000,
+        "Date": "2023-12-05T14:27:34.7094971Z"
+      },
+      {
+        "Amount": -8000,
+        "Date": "2023-12-05T14:29:29.8093074Z"
+      }
+    ],
+    "Budget": 100000
+  }
+]

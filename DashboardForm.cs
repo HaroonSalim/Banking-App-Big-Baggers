@@ -5,6 +5,7 @@ public class DashboardForm : Form
     private Label cardText;
     public delegate void DataChangedEventHandler(object sender, EventArgs e);
     public event DataChangedEventHandler DataChanged;
+    private Panel transactionListContent;
 
     private void OnDataChanged()
     {
@@ -21,6 +22,7 @@ public class DashboardForm : Form
         this.password = password;
         InitializeComponents();
         this.DataChanged += (s, e) => UpdateTotalAmount(email);
+        this.DataChanged += (s, e) => DisplayTopTransactions(email);
     }
 
     private void InitializeComponents()
@@ -28,7 +30,6 @@ public class DashboardForm : Form
         this.Text = "Dashboard";
         this.Size = new System.Drawing.Size(1200, 600);
         this.StartPosition = FormStartPosition.CenterScreen;
-        this.BackColor = Color.FromArgb(44, 62, 80);  // Dark blue background
         this.Font = new Font("Arial", 12);
 
         // Main layout panel
@@ -56,20 +57,19 @@ public class DashboardForm : Form
             tabsPanel.Controls.Add(button);
         }
 
-        // cardPanel is added before transactionList for correct Z-order
         Panel cardPanel = new Panel
         {
             Size = new Size((this.Width * 3) / 4, this.Height),
             Location = new Point(tabsPanel.Width, 0),
-            BackColor = Color.White  // Card panel background
+            BackColor = Color.White
         };
         mainPanel.Controls.Add(cardPanel);
 
         // Smaller card panel for content and buttons
         Panel contentCard = new Panel
         {
-            Size = new Size(500, 150), // Adjust size as needed
-            Location = new Point((cardPanel.Width - 500) / 2, 80), // Positioned at the top middle
+            Size = new Size(500, 150),
+            Location = new Point((cardPanel.Width - 500) / 2, 80),
             BackColor = ColorTranslator.FromHtml("#eef1f4")
         };
         cardPanel.Controls.Add(contentCard);
@@ -103,29 +103,11 @@ public class DashboardForm : Form
         contentCard.Controls.Add(incomeButton);
         contentCard.Controls.Add(expenseButton);
 
-        // Add event handlers
-        incomeButton.Click += (sender, e) =>
-        {
-            IncomeRecordForm incomeRecordForm = new IncomeRecordForm(email, DataChanged);
-            incomeRecordForm.Show();
-            UpdateTotalAmount(email);
-            cardText.Refresh();
-        };
-
-        expenseButton.Click += (sender, e) =>
-        {
-            decimal userBudget = GetUserBudget(email);
-            ExpenseRecordForm expenseForm = new ExpenseRecordForm(email, userBudget, DataChanged);
-            expenseForm.Show();
-            UpdateTotalAmount(email);
-            cardText.Refresh();
-        };
-
         Panel transactionList = new Panel
         {
             Size = new Size(500, 300),
             Location = new Point((cardPanel.Width - 500) / 2, contentCard.Bottom + 20),
-            BackColor = Color.White  // White background for consistency
+            BackColor = Color.White
         };
         cardPanel.Controls.Add(transactionList);
 
@@ -134,30 +116,50 @@ public class DashboardForm : Form
             Text = "Recent Transactions",
             AutoSize = true,
             Location = new Point(0, 8),
-            Font = new Font("Arial", 12, FontStyle.Bold),  // Consistent font style
-            ForeColor = ColorTranslator.FromHtml("#545f71")  // Consistent text color
+            Font = new Font("Arial", 12, FontStyle.Bold), 
+            ForeColor = ColorTranslator.FromHtml("#545f71") 
         };
         transactionList.Controls.Add(transactionListLabel);
 
-        Panel transactionListContent = new Panel
+        transactionListContent = new Panel
         {
             Size = new Size(500, 250),
-            Location = new Point(0, transactionListLabel.Bottom),
-            BackColor = Color.White // Light gray background for a subtle contrast
+            Location = new Point(0, transactionListLabel.Bottom + 10),
+            BackColor = Color.White
         };
         transactionList.Controls.Add(transactionListContent);
 
         // Call the method to display top transactions
-        DisplayTopTransactions(transactionListContent, email);
+        DisplayTopTransactions(email);
+        transactionListContent.Refresh();
 
-        this.BackColor = Color.White; // Set the form's background color to white
+        incomeButton.Click += (sender, e) =>
+        {
+            IncomeRecordForm incomeRecordForm = new IncomeRecordForm(email, DataChanged);
+            incomeRecordForm.Show();
+            UpdateTotalAmount(email);
+            DisplayTopTransactions(email);
+            cardText.Refresh();
+            transactionListContent.Refresh();
+        };
+
+        expenseButton.Click += (sender, e) =>
+        {
+            int userBudget = GetUserBudget(email);
+            ExpenseRecordForm expenseForm = new ExpenseRecordForm(email, userBudget, DataChanged);
+            expenseForm.Show();
+            UpdateTotalAmount(email);
+            DisplayTopTransactions(email);
+            cardText.Refresh();
+            transactionListContent.Refresh();
+        };
+
+        // Set the form's background color to white
+        this.BackColor = Color.White;
 
         // Set the color of all text-containing controls
         Color textColor = ColorTranslator.FromHtml("#545f71");
     }
-
-
-    //---------------------------------------------------------------//
 
     private void TabsPanel_Paint(object sender, PaintEventArgs e)
     {
@@ -264,8 +266,6 @@ public class DashboardForm : Form
     {
         BudgetForm budgetForm = new BudgetForm(email, DataChanged);
         budgetForm.Show();
-        UpdateTotalAmount(email);
-        cardText.Refresh();
     }
 
     private void CurrencyConversionButton_Click(object sender, EventArgs e)
@@ -280,8 +280,7 @@ public class DashboardForm : Form
         analyticsForm.Show();
     }
 
-    //updated Display top transaction
-    private void DisplayTopTransactions(Panel transactionListContent, string email)
+    private void DisplayTopTransactions(string email)
     {
         string filePath = "./database.json";
         try
@@ -297,26 +296,60 @@ public class DashboardForm : Form
 
             transactionListContent.Controls.Clear();
 
-            var topTransactions = user.Transactions.Take(5).ToList();
+            var topTransactions = user.Transactions.OrderByDescending(t => t.Date).Take(5).ToList();
             int labelHeight = 50;
 
             for (int i = 0; i < topTransactions.Count; i++)
             {
                 var transaction = topTransactions[i];
-                Label transactionLabel = new Label
+                bool isIncome = transaction.Amount > 0;
+
+                PictureBox icon = new PictureBox
                 {
-                    Text = $"{(transaction.Amount > 0 ? "Income: $" : "Expense: $")}{Math.Abs(transaction.Amount)} on {transaction.Date.ToShortDateString()}",
+                    Image = Image.FromFile(isIncome ? "./assets/Income-Circle.png" : "./assets/Expense-Circle.png"),
+                    Size = new Size(40, 40),
+                    Location = new Point(5, i * labelHeight + 5),
+                    SizeMode = PictureBoxSizeMode.StretchImage
+                };
+                transactionListContent.Controls.Add(icon);
+
+                Label typeLabel = new Label
+                {
+                    Text = isIncome ? "Bag In" : "Bag Out",
                     AutoSize = false,
-                    Size = new Size(transactionListContent.Width, labelHeight),
-                    Location = new Point(0, i * labelHeight),
+                    Size = new Size(100, 20),
+                    Location = new Point(icon.Right + 10, i * labelHeight),
+                    Font = new Font("Arial", 10, FontStyle.Bold),
+                    ForeColor = ColorTranslator.FromHtml("#545f71"),
+                    TextAlign = ContentAlignment.MiddleLeft
+                };
+                transactionListContent.Controls.Add(typeLabel);
+
+                Label dateLabel = new Label
+                {
+                    Text = $"on {transaction.Date.ToShortDateString()}",
+                    AutoSize = false,
+                    Size = new Size(100, 20),
+                    Location = new Point(icon.Right + 10, i * labelHeight + typeLabel.Height),
                     Font = new Font("Arial", 10),
+                    ForeColor = ColorTranslator.FromHtml("#545f71"),
+                    TextAlign = ContentAlignment.MiddleLeft
+                };
+                transactionListContent.Controls.Add(dateLabel);
+
+                Label amountLabel = new Label
+                {
+                    Text = $"PKR {Math.Abs(transaction.Amount)}",
+                    AutoSize = false,
+                    Size = new Size(transactionListContent.Width - (icon.Right + 20), labelHeight),
+                    Location = new Point(transactionListContent.Width - 100, i * labelHeight), // Adjust 200 to the width of amountLabel
+                    Font = new Font("Arial", 10, FontStyle.Bold),
                     ForeColor = ColorTranslator.FromHtml("#545f71"),
                     TextAlign = ContentAlignment.MiddleLeft,
                     BackColor = Color.White
                 };
-                transactionListContent.Controls.Add(transactionLabel);
+                transactionListContent.Controls.Add(amountLabel);
 
-                // Add a border label below each transaction
                 Label borderLabel = new Label
                 {
                     Size = new Size(transactionListContent.Width, 1), // 1 pixel height for the border
@@ -325,13 +358,12 @@ public class DashboardForm : Form
                 };
                 transactionListContent.Controls.Add(borderLabel);
             }
+            transactionListContent.Refresh();
         }
         catch (Exception ex)
         {
             MessageBox.Show("An error occurred while loading transactions: " + ex.Message);
         }
-
-        transactionListContent.Refresh();
     }
 
     //Updated function
@@ -351,10 +383,10 @@ public class DashboardForm : Form
             }
 
             // Calculate the sum of all transaction amounts
-            decimal totalAmount = user.Transactions.Sum(transaction => transaction.Amount);
+            int totalAmount = user.Transactions.Sum(transaction => transaction.Amount);
 
             // Update the cardText label with the total amount
-            cardText.Text = $"PKR {totalAmount:N2}";
+            cardText.Text = $"PKR {totalAmount}";
             cardText.Refresh();
         }
         catch (Exception ex)
@@ -363,7 +395,7 @@ public class DashboardForm : Form
         }
     }
 
-    private decimal GetUserBudget(string email)
+    private int GetUserBudget(string email)
     {
         string filePath = "./database.json";
         try

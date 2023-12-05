@@ -6,32 +6,30 @@ public class UserManager
 {
 	private const string UserFilePath = "./database.json";
 
+	// registration method
 	public void RegisterUser(string username, string email, string password)
 	{
-		//------------------CHECKING FOR USERNAME-------------------//
+		// verify username, email, and password are valid
 		if (username.Length < 4 && username.Length > 20 && username != "")
 		{
 			MessageBox.Show("Username must be between 4 to 20 characters.");
 			return;
 		}
-
-		//------------------CHECKING FOR EMAIL FORMAT-------------------//
 		if (!IsEmailValid(email))
 		{
 			MessageBox.Show("Invalid email format.");
 			return;
 		}
-
-		//------------------CHECKING FOR PASSWORD COMPLEXITY-------------------//
 		if (!IsPasswordComplex(password))
 		{
 			MessageBox.Show("Password must have at least 8 characters, including one uppercase letter and one digit.");
 			return;
 		}
 
-		//------------------PASSWORD HASH GENERATION-------------------//
+		// generate password hash
 		string passwordHash = GeneratePasswordHash(password);
 
+		// read existing user data and add new user
 		string jsonData = File.ReadAllText(UserFilePath);
 		List<UserInfo> users = JsonConvert.DeserializeObject<List<UserInfo>>(jsonData) ?? new List<UserInfo>();
 
@@ -51,7 +49,7 @@ public class UserManager
 		MessageBox.Show("Registration successful!");
 	}
 
-	//-------------------ALL THE LOGIN PROCEDURE FILE CHECKING---------------------//
+	// login method
 	public bool Login(string username, string email, string password)
 	{
 		try
@@ -81,14 +79,14 @@ public class UserManager
 		// Handle exceptions (e.g., file not found, invalid JSON)
 		MessageBox.Show($"An error occurred while reading user data: {ex.Message}");
 	}
-
-	//-------------------VALID CHARACTER IN THE EMAIL---------------------//
+	
+	// email validation method
 	private bool IsEmailValid(string email)
 	{
 		return Regex.IsMatch(email, @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
 	}
 
-	//-------------------PASSWORD COMPLEXITY---------------------//
+	// password validation method
 	private bool IsPasswordComplex(string password)
 	{
 		if (password.Length < 8)
@@ -119,7 +117,7 @@ public class UserManager
 		return hasDigit && hasLower && hasUpper;
 	}
 
-	//----------------PASSWORD HASH---------------------//
+	// password hash generation method
 	private string GeneratePasswordHash(string password)
 	{
 		byte[] salt;
@@ -135,7 +133,7 @@ public class UserManager
 	}
 
 
-	//-------------------VERIFY PASSWORD HASH---------------------//
+	// verify password hash method
 	private bool VerifyPasswordHash(string password, string storedHash)
 	{
 		byte[] hashBytes = Convert.FromBase64String(storedHash);

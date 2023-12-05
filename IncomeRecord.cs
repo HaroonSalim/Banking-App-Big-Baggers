@@ -1,8 +1,4 @@
-using System;
-using System.Drawing;
-using System.Windows.Forms;
 using Newtonsoft.Json;
-using System.IO;
 using static DashboardForm;
 
 
@@ -51,30 +47,16 @@ public class IncomeRecordForm : Form
             Format = DateTimePickerFormat.Short,
         };
 
-        Label categoryLabel = new Label
-        {
-            Text = "Category:",
-            Location = new System.Drawing.Point(20, datePicker.Bottom + 25),
-            Font = new System.Drawing.Font("Arial", 12),
-        };
-
-        TextBox categoryTextBox = new TextBox
-        {
-            Location = new System.Drawing.Point(120, datePicker.Bottom + 20),
-            Size = new System.Drawing.Size(200, 20),
-        };
-
         Button saveButton = new Button
         {
             Text = "Save",
-            Location = new System.Drawing.Point(150, categoryTextBox.Bottom + 30),
+            Location = new System.Drawing.Point(150, datePicker.Bottom + 30),
             Size = new System.Drawing.Size(100, 30),
             Font = new System.Drawing.Font("Arial", 12),
         };
 
         saveButton.Click += (sender, e) =>
         {
-            // string currentUser = "UsernameOfCurrentUser";  // Replace this with the actual username
             SaveIncomeRecord(amountTextBox.Text, email);
         };
 
@@ -82,15 +64,13 @@ public class IncomeRecordForm : Form
         this.Controls.Add(amountTextBox);
         this.Controls.Add(dateLabel);
         this.Controls.Add(datePicker);
-        this.Controls.Add(categoryLabel);
-        this.Controls.Add(categoryTextBox);
         this.Controls.Add(saveButton);
     }
 
     // Update SaveIncomeRecord method
     private void SaveIncomeRecord(string amount, string email)
     {
-        if (string.IsNullOrWhiteSpace(amount) || !decimal.TryParse(amount, out decimal parsedAmount) || parsedAmount <= 0)
+        if (string.IsNullOrWhiteSpace(amount) || !int.TryParse(amount, out int parsedAmount) || parsedAmount <= 0)
         {
             MessageBox.Show("Invalid amount. Please enter a positive number.");
             return;
@@ -115,7 +95,7 @@ public class IncomeRecordForm : Form
                 user.Transactions = new List<TransactionInfo>();
             }
 
-            // Update the Transactions list
+            // Updating the Transactions list
             user.Transactions.Add(new TransactionInfo
             {
                 Amount = parsedAmount,

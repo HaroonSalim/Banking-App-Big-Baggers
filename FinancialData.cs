@@ -9,12 +9,12 @@ public class UserInfo
     public string Username { get; set; }
     public string Email { get; set; }
     public string Password { get; set; }
-    public List<TransactionInfo> Transactions { get; set; } 
-    public decimal Budget { get; set; }
+    public List<TransactionInfo> Transactions { get; set; }
+    public int Budget { get; set; }
 }
 
 public class TransactionInfo
 {
-    public decimal Amount { get; set; }
+    public int Amount { get; set; }
     public DateTime Date { get; set; }
 }

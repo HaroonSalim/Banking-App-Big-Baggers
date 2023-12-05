@@ -55,7 +55,6 @@ public class TransactionsForm : Form
                 }
                 else
                 {
-                    // Handle unsupported format or ignore old transactions
                     continue;
                 }
             }

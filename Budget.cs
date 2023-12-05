@@ -59,7 +59,7 @@ public class BudgetForm : Form
     // Update SaveBudget method
     private void SaveBudget(string budget, string email)
     {
-        if (string.IsNullOrWhiteSpace(budget) || !decimal.TryParse(budget, out decimal parsedBudget) || parsedBudget <= 0)
+        if (string.IsNullOrWhiteSpace(budget) || !int.TryParse(budget, out int parsedBudget) || parsedBudget <= 0)
         {
             MessageBox.Show("Invalid budget. Please enter a positive number.");
             return;

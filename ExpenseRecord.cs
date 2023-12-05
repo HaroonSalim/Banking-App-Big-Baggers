@@ -1,24 +1,18 @@
-using System;
-using System.Drawing;
-using System.Windows.Forms;
 using Newtonsoft.Json;
-using System.IO;
 using static DashboardForm;
 
 public class ExpenseRecordForm : Form
 {
     private TextBox amountTextBox;
     private DateTimePicker datePicker;
-    private TextBox categoryTextBox;
-    private TextBox descriptionTextBox;
     private Button saveButton;
     private string email;
     private readonly DataChangedEventHandler dataChangedCallback;
 
-    private readonly decimal budget;
+    private readonly int budget;
 
 
-    public ExpenseRecordForm(string email, decimal budget, DataChangedEventHandler callback)
+    public ExpenseRecordForm(string email, int budget, DataChangedEventHandler callback)
     {
         this.email = email;
         this.dataChangedCallback = callback;
@@ -59,42 +53,22 @@ public class ExpenseRecordForm : Form
             Format = DateTimePickerFormat.Short,
         };
 
-        Label categoryLabel = new Label
-        {
-            Text = "Category:",
-            Location = new System.Drawing.Point(20, datePicker.Bottom + 20),
-            Font = new System.Drawing.Font("Arial", 12),
-        };
-
-        categoryTextBox = new TextBox
-        {
-            Location = new System.Drawing.Point(120, datePicker.Bottom + 20),
-            Size = new System.Drawing.Size(200, 20),
-        };
-
         Label descriptionLabel = new Label
         {
             Text = "Description:",
-            Location = new System.Drawing.Point(20, categoryTextBox.Bottom + 20),
+            Location = new System.Drawing.Point(20, datePicker.Bottom + 20),
             Font = new System.Drawing.Font("Arial", 12),
-        };
-
-        descriptionTextBox = new TextBox
-        {
-            Location = new System.Drawing.Point(120, categoryTextBox.Bottom + 20),
-            Size = new System.Drawing.Size(200, 20),
         };
 
         saveButton = new Button
         {
             Text = "Save Expense",
-            Location = new System.Drawing.Point(150, descriptionTextBox.Bottom + 30),
+            Location = new System.Drawing.Point(150, datePicker.Bottom + 30),
             Size = new System.Drawing.Size(150, 30),
             Font = new System.Drawing.Font("Arial", 12),
         };
         saveButton.Click += (sender, e) =>
         {
-            // string currentUser = "UsernameOfCurrentUser";  // Replace this with the actual username
             SaveButton_Click(amountTextBox.Text, email);
         };
 
@@ -102,17 +76,13 @@ public class ExpenseRecordForm : Form
         this.Controls.Add(amountTextBox);
         this.Controls.Add(dateLabel);
         this.Controls.Add(datePicker);
-        this.Controls.Add(categoryLabel);
-        this.Controls.Add(categoryTextBox);
-        this.Controls.Add(descriptionLabel);
-        this.Controls.Add(descriptionTextBox);
         this.Controls.Add(saveButton);
     }
 
     //Updated
     private void SaveButton_Click(string amount, string email)
     {
-        if (string.IsNullOrWhiteSpace(amount) || !decimal.TryParse(amount, out decimal parsedAmount) || parsedAmount <= 0)
+        if (string.IsNullOrWhiteSpace(amount) || !int.TryParse(amount, out int parsedAmount) || parsedAmount <= 0)
         {
             MessageBox.Show("Invalid amount. Please enter a positive number.");
             return;

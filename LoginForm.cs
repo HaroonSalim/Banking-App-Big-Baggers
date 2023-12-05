@@ -122,8 +122,6 @@ public class LoginForm : Form
             textBox.ForeColor = System.Drawing.Color.Gray;
         }
     }
-    //-----------------------------------------------------------------------//
-
 
     private void InitializeComponents()
     {
