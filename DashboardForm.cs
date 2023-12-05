@@ -48,7 +48,7 @@ public class DashboardForm : Form
 
         // Adding tabs
         string[] buttonNames = { "Transactions", "Budget", "Analytics", "Currency Conversion", "Profile", "Logout" };
-        EventHandler[] eventHandlers = { DisplayTransactionsButton_Click, ProfileButton_Click, LogoutButton_Click, BudgetButton_Click, AnalyticsButton_Click, CurrencyConversionButton_Click };
+        EventHandler[] eventHandlers = { DisplayTransactionsButton_Click, BudgetButton_Click, AnalyticsButton_Click, CurrencyConversionButton_Click, ProfileButton_Click, LogoutButton_Click };
 
         for (int i = 0; i < buttonNames.Length; i++)
         {
